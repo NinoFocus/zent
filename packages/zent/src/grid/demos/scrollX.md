@@ -1,5 +1,5 @@
 ---
-order: 7
+order: 8
 zh-CN:
 	title: 水平滚动
 	product: 商品
@@ -19,54 +19,62 @@ en-US:
 ---
 
 ```jsx
-import { Grid } from 'zent';
+import { Grid, NumberInput } from 'zent';
 
 const columns = [
 	{
 		title: '{i18n.productName}',
 		name: 'name',
 		width: 100,
-		fixed: true
-	}, {
+		fixed: true,
+	},
+	{
 		title: '{i18n.uv}',
 		name: 'uv',
 		width: 100,
-		fixed: true
-	}, {
+		fixed: true,
+	},
+	{
 		title: '{i18n.stock}',
-		name: 'stock'
-	}, {
+		name: 'stock',
+	},
+	{
 		title: '{i18n.soldNumber}',
-		name: 'sold_num'
-	}, {
+		name: 'sold_num',
+	},
+	{
 		title: '{i18n.createdTime}',
 		name: 'created_time',
 		width: 100,
-		fixed: 'right'
-	}
+		fixed: 'right',
+	},
 ];
 
 const datasets = [];
 
 for (let i = 0; i < 3; i++) {
 	datasets.push({
+		id: i,
 		name: `{i18n.product} ${i}`,
 		uv: 20,
 		stock: 5,
 		sold_num: 5,
-		created_time: '2017-09-20'
-	})
+		created_time: '2017-09-20',
+	});
+}
+
+function App() {
+	const [x, setX] = React.useState(1300);
+	return (
+		<div>
+			<NumberInput value={x} onChange={setX} integer addonAfter="px" style={{ marginBottom: 16 }} />
+			<Grid columns={columns} datasets={datasets} scroll={{ x }} />
+		</div>
+	);
 }
 
 ReactDOM.render(
-		<div>
-			<Grid
-				columns={columns}
-				datasets={datasets}
-				scroll={{ x: 1300 }}
-			/>
-		</div>
-	, mountNode
+	<App />,
+	mountNode
 );
-
 ```

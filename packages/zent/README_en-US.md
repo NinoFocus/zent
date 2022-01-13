@@ -16,15 +16,36 @@ Our goal is making React development faster and simpler.
 * Builtin TypeScript support
 * Supports custom themes
 * Import JavaScript and styles only if they are used
-* yarn + webpack + babel + postcss + prettier + stylefmt
 * Handmade icon font
-* Tests coverage is above 90%
 
 ### Supported Environments
 
-* React >= 15.6
-* Modern browsers and IE >= 11
+* React >= 17
 * Supports server-side rendering(SSR)
+
+### Browsers
+
+* Firefox >= 78(ESR)
+* Chrome >= 49
+* Safari >= 10
+* Edge
+* No IE support
+
+#### Polyfills needed for supported browsers
+
+- `es6.object.assign`
+- `es6.object.is`
+- `es6.string.ends-with`
+- `es6.string.starts-with`
+- `es6.string.includes`
+- `es7.string.trim-left`
+- `es7.string.trim-right`
+- `es6.array.from`
+- `es6.array.of`
+- `es6.array.fill`
+- `es6.array.find`
+- `es6.array.find-index`
+- `es7.array.includes`
 
 ### Install
 
@@ -52,12 +73,18 @@ import { Button } from 'zent';
 
 // Transforms into
 
-import Button from 'zent/lib/button';
+import Button from 'zent/es/button';
 ```
 
 This plugin is useful if you are developing a library based on Zent, or if you only use a small part of Zent components.
 
 You can find detailed instructions in its [documentation](babel-plugin-zent).
+
+Using ESM with tree-shaking enabled bundler is also possible.
+
+### Theme
+
+Please refer to [Themes](theme)
 
 <style>
 img[alt="zent-components"] {

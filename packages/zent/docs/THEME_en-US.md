@@ -4,84 +4,87 @@ Zent supports themes, only colors are customizable for now.
 
 ![zent-theme](https://img.yzcdn.cn/zanui/react/zent-theme.png)
 
-### Customize
+### Customize through CSS variables
 
-Styles in Zent are written in [postcss](http://postcss.org/), so we have a postcss plugin [postcss-theme-variables](https://www.npmjs.com/package/postcss-theme-variables) to support themes.
+Zent uses [CSS Variables](https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties), so it is possible to customize themes via custom CSS variables.
 
-There're two different ways to use this plugin:
+Each theme color should be provided in both HEX and RGB format, for example:
 
-1. Build a custom css style within Zent.
-2. Import Zent's style source files within your project and config postcss to use custom colors.
+```css
+:root {
+	/* Use these when opacity is not needed */
+  --theme-primary-1: #252b6e;
+  --theme-primary-2: #3c46b1;
+  --theme-primary-3: #434fc9;
+  --theme-primary-4: #515ff0;
+  --theme-primary-5: #6c78f2;
+  --theme-primary-6: #7e88f3;
+  --theme-primary-7: #b0b6f8;
+	--theme-primary-8: #f2f3fe;
+	
+	/* Values are the same as above, but used when opacity is required */
+  --theme-rgb-primary-1: 37, 43, 110;
+  --theme-rgb-primary-2: 60, 70, 177;
+  --theme-rgb-primary-3: 67, 79, 201;
+  --theme-rgb-primary-4: 81, 95, 240;
+  --theme-rgb-primary-5: 108, 120, 242;
+  --theme-rgb-primary-6: 126, 136, 243;
+  --theme-rgb-primary-7: 176, 182, 248;
+  --theme-rgb-primary-8: 242, 243, 254;
+}
+```
 
-Each has its own pros and cons. 
+These variables can be generated with this code：
 
-The first one is non-intrusive, but you have to manually build your custom theme every time you upgrade Zent.
+```scss
+// TODO: define your theme overrides here, and that's all!
+$theme-overrides: (
+	--theme-primary-1: #252b6e,
+	--theme-primary-2: #3c46b1,
+	--theme-primary-3: #434fc9,
+	--theme-primary-4: #515ff0,
+	--theme-primary-5: #6c78f2,
+	--theme-primary-6: #7e88f3,
+	--theme-primary-7: #b0b6f8,
+	--theme-primary-8: #f2f3fe,
+);
 
-On the other hand, the second one is intrusive, you have to adjust your project's building process to support Zent's postcss files. The good news is you don't have to rebuild your custom theme when you upgrade Zent.
+@mixin theme-css-vars($vars) {
+	@each $name, $color in $vars {
+		#{$name}: $color;
+	}
+}
 
-Rule of thumb: Use option 1 unless you happen to use postcss in your project.
+@mixin theme-rgb-css-vars($vars) {
+	@each $name, $color in $vars {
+		#{str-insert($name, "-rgb", 8)}: to-rgb($color);
+	}
+}
 
-#### Option 1
+@function to-rgb($color) {
+	@return red($color), green($color), blue($color);
+}
+
+:root {
+	@include theme-css-vars($theme-overrides);
+
+	// Same but used in rgba contexts
+	@include theme-rgb-css-vars($theme-overrides);
+}
+```
+
+### Customize through rebuilding SCSS
+
+Styles in Zent are written in [scss](https://sass-lang.com), we have a builtin theme extension file to support custom themes. You can build custom styles using this extension file.
+
+This method is non-intrusive, but you have to manually build your custom theme every time you upgrade Zent.
+
+#### Build Steps
 
 1. Clone Zent from [github](https://github.com/youzan/zent) and install dependencies
-2. Create a file in `packages/zent`, e.g. `custom-theme.js`, define your custom colors in this file. All customizable colors are defined in [Colors](colors).
-3. Run `yarn theme custom-theme.js` within `packages/zent`
-4. Your custom theme is in `packages/zent/css`.
-
-```
-/* custom-theme.js */
-
-// Only customize primary colors
-module.exports = {
-  'theme-primary-1': '#72f',
-  'theme-primary-2': '#83f',
-  'theme-primary-3': '#95f',
-  'theme-primary-4': '#dbf',
-  'theme-primary-5': '#f7e8fd',
-  'theme-primary-6': '#f3eaff',
-};
-```
-
-#### Option 2
-
-Make sure you are using Zent's postcss source files for styling, you can find them in `zent/assets`.
-
-You can import all styles with one line `import zent/assets/index.pcss`.
-
-Or you can use [babel-plugin-zent](babel-plugin-zent)'s `useRawStyle` option to automatically import postcss styles for you.
-
-Please refer to the following postcss configuration, make sure postcss-theme-variables is properly configured. Read the plugin docs [here](https://www.npmjs.com/package/postcss-theme-variables).
-
-```
-module.exports = {
-  plugins: [
-    require('postcss-easy-import')({
-      prefix: '_',
-      extensions: ['pcss', 'css']
-    }),
-    require('postcss-theme-variables')({
-      // ... your overrides here
-      vars: {
-        'theme-primary-1': '#72f',
-        'theme-primary-2': '#83f',
-        'theme-primary-3': '#95f',
-        'theme-primary-4': '#dbf',
-        'theme-primary-5': '#f7e8fd',
-        'theme-primary-6': '#f3eaff',
-      },
-      // precss variables starts with $
-      prefix: '$'
-    })
-    require('autoprefixer'),
-    require('precss'),
-
-    // Minify(Optional)
-    require('cssnano')({ safe: true })
-  ]
-};
-```
-
-
+2. Create a file named [`_override.scss`](https://github.com/youzan/zent/blob/master/packages/zent/assets/theme/_override_.scss) in `packages/zent/assets`, define your custom colors in this file. All customizable colors are defined in [`_default.scss`](https://github.com/youzan/zent/blob/master/packages/zent/assets/theme/_default.scss) within the same directory.
+3. Run `yarn theme` within `packages/zent`
+4. Your custom theme styles are in `packages/zent/css`.
 
 <style>
   img[alt="zent-theme"] {

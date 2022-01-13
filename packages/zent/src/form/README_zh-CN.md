@@ -8,385 +8,455 @@ scatter: true
 
 ## Form 表单组件
 
-1. [使用指南](#shi-yong-zhi-nan)
-2. [表单校验](#biao-dan-xiao-yan)
-3. [格式化 value](#ge-shi-hua-value)
-4. [表单操作](#biao-dan-cao-zuo)
-5. [其他](#qi-ta)
-6. [组件原理](#zu-jian-yuan-li)
-7. [其他说明](#qi-ta-shuo-ming)
-8. [API](#api)
+### ⚠️ 警告
 
-### 使用指南
+这是新版的 `Form` 组件，和 `7.0.0` 之前版本的 `Form` 组件不兼容，可以在[这里查看老版 `Form` 组件的文档](https://zent-contrib.github.io/zent-compat)。
 
-#### 表单 `Form`
+`Form` 和其他组件相比，本身功能和 API 都相对复杂，请先仔细阅读完本文档再使用。
 
-- `Form` 组件提供三种样式：`inline`，`horizontal`， `vertical`。
-- 使用 `Form` 组件，必须先调用 `createForm` 方法包装，为表单注入 `zentForm` 属性，从而提供表单和表单元素的各种操作方法，详见 demo 和 [`zentForm` API](#zentform) 。
+### API 文档
 
+`Form` 的 API 较多，文档里遗漏某些 API 的话请尝试搜索 tsdoc 生成的 [API 文档](../../apidoc)，同时可以在 [Github 上提个 issue](https://github.com/youzan/zent/issues/new)，帮助我们改进文档，issue 里请详细描述少了哪个 API 或者组件的信息。
 
-#### 表单域 `Field`
+### Form 的分层结构
 
-`Field` 组件本质上是一个辅助性的组件，不提供任何样式，只负责管理表单元素 value 值的生命周期和表单元素的 error 等信息。
+为了帮助更好的理解和使用 `Form`，先从设计的角度对 `Form` 做一个概述。`Form` 设计上可以大致分为 3 层：
 
-- `Field` 必须要有 `name` 属性；
-- `Field` 的展现形式由 `component` 属性传入的组件决定，`Form` 组件中内置了常用的表单元素组件，也可以使用单独封装的自定义表单元素组件。
-  * `FormInputField`
-  * `FormSelectField`
-  * `FormRadioGroupField`
-  * `FormCheckboxField`
-  * `FormCheckboxGroupField`
-  * `FormNumberInputField`
-  * `FormSwitchField`
-  * `FormColorPickerField`
-  * `FormDatePickerField`
-  * `FormWeekPickerField`
-  * `FormMonthPickerField`
-  * `FormQuarterPickerField`
-  * `FormYearPickerField`
-  * `FormTimePickerField`
-  * `FormTimeRangePickerField`
-  * `FormDateRangePickerField`
-  * `FormDateRangeQuickPickerField`
-- `Form` 组件提供了 `getControlGroup` 方法，可以快速封装自定义表单元素组件，使用方法参考 demo 和 [`getControlGroup` API](#form-getcontrolgroup) 。
+- 数据层：这一层在内部由一个叫 `formulr` 的内部包构成，它和 UI 无关
+- React 绑定层：这一层也在 `formulr` 内，但只包含最基础的 Hooks（例如 `useField` 等），依旧和 UI 无关
+- UI 层：这一层负责处理数据层和 `Zent` 组件库的适配，这一层只处理 UI 逻辑，不关心数据的具体处理逻辑
 
-注：底层组件中的 `format` 属性因为名称和 `Field` 上的 `format` 属性冲突，`FormDatePickerField` 以及其他年月日相关的 `XyzPickerField` 的 `format` 属性变更为 `dateFormat`；`FormTimePickerField` 以及 `FormTimeRangePickerField` 的 `format` 属性变更为 `timeFormat`。
+### 数据层
 
+数据层主要由各种类型的 model, validator 以及 builder 构成。model 主要分为以下几种：
+
+- `IModel` 这是最底层 interface，所有 model 都实现它
+- `BasicModel` 这是一个 model 的基类，所有 model 都继承自它
+- `FieldModel` 单个表单域的 model
+- `FieldArrayModel` 一组相同表单域的 model
+- `FieldSetModel` 一组有相关性的表单域，通常这些表单域作为一个整体才有意义，比如手机号的国家代码+号码
+- `FormModel` 继承自 `FieldSetModel`，从数据层看就是 `FieldSetModel`，但是额外添加了一些表单顶层才需要的能力
+- `ModelRef` 类似 React 的 ref 概念，它的用处是在不知道具体的 model 类型时用作占位元素。只有 `View` 模式下才会出现。
+
+model 是数据和状态的容器，所以 model 上只有操作数据和状态的方法。不管 model 是什么类型，一个 model 上一定维护着值、校验状态、错误信息以及 touched 等一些基础状态，以及读取/操作这些信息的方法。下面是所有 model 上一些常见的方法和属性列表，额外的方法和属性可以通过 [API 文档](../../apidoc)中搜索相应的 model 类型查看。
+
+- `value` 获取 model 当前的值
+- `getSubmitValue()` 获取用于表单提交的值，可以通过 `Field` 的 `normalize` 属性自定义格式化逻辑
+- `initialize(value: Value)` 初始化 model 值
+- `patchValue(value: Value)` 更新 model 值
+- `reset()` 重置 model 为初始值
+- `clear()` 重置 model 为默认值
+- `valid()` 返回 model 是否通过检验，该函数不会触发校验
+- `validate(options?: ValidateOption)` 触发 model 上的校验逻辑
+- `error` 获取 model 上的错误信息
+- `clearError()` 清楚 model 的错误信息
+- `dirty()` model 值是否被修改过
+- `pristine()` model 值是否从未被修改过
+- `touched()` model 对应的 Field 是否被用户操作过
+
+`FieldArrayModel` 上还有一批类似数组操作元素的方法，行为和数组上的方法一致，接受值或者 model 对象作为参数。
+
+- `push`
+- `pop`
+- `shift`
+- `unshift`
+- `splice`
+- `filter` 该方法直接操作当前的 `FieldArrayModel` 对象，而不是返回一个新的 `FieldArrayModel`
+- `sort`
+- `children` 获取所有子 model，是个只读数组
+- `get(index: number)` 返回指定下标处的子 model 对象
+
+`FieldSetModel` 上的额外方法：
+
+- `children` 获取所有子 model，是个只读对象
+- `get(name: string)` 返回指定名字的子 model 对象
+- `registerChild(name, model): void` 注册一个子 model 对象
+- `removeChild(name)` 删除一个子 model
+
+⚠️ 注意：不要直接操作 `FieldArrayModel` 和 `FieldSetModel` 的 `children` 属性（本身就是只读属性），请使用 model 上提供的 mutation API 操作，否则会破坏 model 内部数据一致性，导致不可预期的问题。
+
+validator 和 builder 下文会详细说明。
+
+### Form 的运行模式
+
+**这是使用 `Form` 时的一个非常重要的概念，请一定理解清楚。另外，我们推荐使用 `Model` 模式，而非 `View` 模式。**
+
+在 `ModelRef` 里提到了 `Form` 的 `View` 模式，这里详细说明以下 `Form` 的两种运行模式(`FormStrategy`)，`View` 模式和 `Model` 模式。
+
+- `View` 模式是指表单的 model 是通过 UI 的结构，由 `Form` 自动推导生成的。简单来说，先有 UI，再有 model。上面提到的 `ModelRef` 即是在一些场景下 model 还未生成时用来做占位的，所以才说 `ModelRef` 仅出现在 `View` 模式下。
+- `Model` 模式则是由开发者创建好表单的 model 结构，然后作为 `Form` 的初始化参数传入的，所以是先有 model，再有 UI。
+
+`FormStrategy` 指明了表单是由视图驱动（View 模式）的还是独立数据驱动（Model 模式），两种模式在使用 API 时也会有差异。
+
+- 当使用 `View` 模式时，表单项组件和 `hooks` 接受一个 `name` 参数而不是一个 model。
+- 当使用 `Model` 时，由于数据层是在表单外构建的，表单组件必须直接传入该字段对应的 `model`，而不是 `name`；但是使用 Form 的 Hooks 时，支持传入字段 `name` 或者 `model`，这种场景相当于是一个只读的订阅行为。
+- 除了上述区别之外，**不同模式下表单组件以及 `hooks` 会有一些参数不同**，具体请查阅 [API 文档](../../apidoc)。
+
+### 常用 `Form` API
+
+`form` 对象具备一些基础的能力：
+
+- `form.submit()` 显式触发表单提交事件，会自动触发表单校验。
+- `form.isSubmitting` 表单是否在提交中。
+- `form.isSubmitFailed` 表单上一次提交是否失败。
+- `form.isSubmitSucceeded` 表单上一次提交是否成功。
+- `form.validate(options?: ValidateOption)` 触发一次表单校验。
+- `form.isValid()` 表单是否通过校验，不会自动触发 `form.validate`。
+- `form.isValidating()` 表单是否正在校验过程中。
+- `form.model` 获取表单对应的 model 对象。
+- `form.getValue()` 获取表单当前的值。
+- `form.getSubmitValue()` 获取表单当前的值，用于需要在提交前通过 `normalizeBeforeSubmit` 格式化表单值的场景。
+- `form.patchValue()` 更新给定字段的值。
+- `form.initialize()` 初始化表单值，同时将这个值作为表单的 `initialValue` 。
+- `form.resetValue()` 将所有字段重置为 `initialValue` ，不会触发表单事件，如果 `initialValue` 不存在，则使用 `defaultValue` 。
+- `form.clear()` 将所有字段赋值为 `defaultValue` ，同时清空 `initialValue` 。
+- `form.reset()` 显式触发表单重置事件 。
+
+#### `Form` 组件的 Props
+
+- `form` `useForm` 的返回值
+- `layout` 表单项内的布局模式，支持水平布局和垂直布局，默认垂直
+- `direction` 表单项间的排列方式，支持水品排列和垂直排列，默认垂直
+- `disabled` 禁用表单输入，开启后表单内所有元素不可编辑。注意：自定义组件需要自己实现禁用逻辑和展示
+- `disableEnterSubmit` 禁用表单内 `input` 元素的回车提交功能
+- `onReset` 表单重置回调函数，`form.reset` 或者原生的 DOM 触发的 `reset` 事件都会触发 `onReset`
+- `onSubmit` 表单提交回调函数，`form.submit` 或者原生的 DOM 触发的 `submit` 事件都会触发 `onSubmit`
+- `onSubmitFail` 表单提交失败时的回调函数
+- `onSubmitSuccess` 表单提交成功时的回调函数
+- `scrollToError` 表单校验报错时自动滚动到第一个错误的位置
+- `willScrollToError` 触发滚动到第一个错误前的回调函数，如果返回一个 `Promise`，当 `Promise` `resolve` 时才会继续执行滚动，`reject` 将终止滚动操作。 可以返回 `IFormScrollToErrorOptions` 用来调整滚动的节点和位置
+  - `scrollContainer` 自定义滚动的 DOM 节点，默认 `document.body`
+  - `offsetX` 自定义滚动的 x 轴偏移量
+  - `offsetY` 自定义滚动的 y 轴偏移量
+- 详细参数请[参考这里](../../apidoc/interfaces/IFormProps.html)
+
+#### `defaultValue` vs `initialValue`
+
+- `initialValue`：初始值，在逻辑上作为表单首次展示的值，可以被更新。
+- `defaultValue`：缺省值，在表单没有输入时使用的值，组件一旦渲染就不可再被更新。
+
+### Hooks
+
+`Form` 提供以下基础的 hooks，在内置的这些 `Form` 组件无法满足需要时，可以使用这些 hooks 来封装自定义的 `Form` 组件。
+
+- `Form.useForm` 获取 `Form` 对象，[查看 API 文档](../../apidoc/classes/Form.html#useForm)
+- `Form.useField` 获取 `Field`，[查看 API 文档](../../apidoc/classes/Form.html#useField)
+- `Form.useFieldArray` 获取 `FieldArray`，[查看 API 文档](../../apidoc/classes/Form.html#useFieldArray)
+- `Form.useFieldSet` 获取 `FieldSet`，[查看 API 文档](../../apidoc/classes/Form.html#useFieldSet)
+
+#### 基础使用方法
+
+所有表单组件必须包裹在一个 `Form` 组件内部，每一个表单项对应一个 `Field`，我们已经内置了 Zent 组件对应的 `Field` 组件；也可以使用自己封装的自定义表单项组件。
+
+- `FormInputField`
+- `FormSelectField`
+- `FormRadioGroupField`
+- `FormCheckboxField`
+- `FormCheckboxGroupField`
+- `FormNumberInputField`
+- `FormSwitchField`
+- `FormColorPickerField`
+- `FormDatePickerField`
+- `FormWeekPickerField`
+- `FormMonthPickerField`
+- `FormQuarterPickerField`
+- `FormYearPickerField`
+- `FormTimePickerField`
+- `FormTimeRangePickerField`
+- `FormDateRangePickerField`
+- `FormCombinedTimeRangePickerField`
+- `FormCombinedDateRangePickerField`
+- `FormDateRangeQuickPickerField`
+
+`Field` 组件支持的完整参数列表可以[参考这里](../../apidoc/interfaces/IFormFieldPropsBase.html)，以及[这里除 `invalid` 之外的参数](../../apidoc/interfaces/IFormControlProps.html)；这些都是两种模式下通用的参数。
+
+- `after` 在表单项后面显示的自定义内容
+- `before` 在表单项前面显示的自定义内容
+- `format` 渲染前会先调用 `format` 格式化
+- `normalize` 触发 `onChange` 时会先经过 `normalize` 再写入到内部的 model 上
+- `getValidateOption` 根据触发校验的事件源头返回校验规则
+- `helpDesc` 表单项说明文案
+- `notice` 表单项警示性文案
+- `renderError` 自定义错误渲染，参数是 validator 返回的对象，一次只会有一个错误
+- `required` 是否必填，如果这项有值，会在校验规则里添加一个 `required` 规则，相当于一个快捷设置
+- `touchWhen` 什么时候标记表单项为 `touched`
+- `validateOccasion` 什么时候触发校验
+- `withoutError` 不显示错误，开启后一般需要自行处理错误的展示
+- `withoutLabel` 默认不传 `label` 的时候也会留有 `label` 的空间，使用 `withoutLabel` 去掉这个留空
+- `label` 表单项的名称
+- `className` 自定义类名
+- `children` 不解释
+- `modelRef` Field 对应 model 的 ref，可以通过这个 `modelRef.current` 直接访问 model 上的方法和属性
+
+`View` 模式还支持[以下参数](../../apidoc/interfaces/IFormFieldViewDrivenProps.html)。
+
+- `defaultValue` 缺省值，作为没有用户输入时的值，不可变
+- `destroyOnUnmount` 是否在组件 `unmount` 的时候销毁 model 对象，销毁时机依赖 React 执行时机。__使用前请看下面的注意事项。__
+- `initialValue` 初始值，在逻辑上作为字段首次展示的值，可变
+- `name` 表单项对应的数据字段名
+- `normalizeBeforeSubmit` 用于表单提交前格式化 `Field` 值的回调函数
+- `validators` 校验规则列表，执行的时候会按数组顺序逐个调用，直到所有都通过或者在第一个失败的地方停止
+
+注意：
+- 不要在 `View` 模式下通过**条件渲染**将同一个 `name` 的 model 渲染成不同的 `Field` 实例，并且同时在 `Field` 上开启 `destroyOnUnmount` 参数。我们认为这是很 tricky 的不合理用法，一旦发现这种场景，`name` 对应的那个 `Field` 将进入不可用状态，后续所有操作都会报错。
+- 在 `View` 模式下使用 `FieldArray` 时，由于该组件的特殊性，虽然此时传给 `Field` 的是个 `ModelRef`，按之前提到的规则这就是 `Model` 模式，但是校验规则还是需要设置在表单项上。
+
+`Model` 模式还支持[以下参数](../../apidoc/interfaces/IFormFieldModelDrivenProps.html)。注意，此模式下校验规则正常是设置在 model 上的，而不是表单项组件上。
+
+- `model` 表单项对应的数据
+- `initialValue` 初始值，用于覆盖 model 上的初始值，仅当值不等于 `undefined` 时生效
+
+注意：如果需要给 `Field` 封装的组件传递 props，需要将所有 props 通过 `props` 传递，例如 `<FormInputField props={{ spellCheck: false }} />`，`spellCheck` 将会被透传到 `Input` 组件上；如果直接写在 `FormInputField` 上不会生效。
 
 <!-- demo-slot-1 -->
 <!-- demo-slot-2 -->
-
-#### 使用 `getControlGroup` 封装自定义表单域
-
-<!-- demo-slot-3 -->
-
-#### 多个表单元素的封装
-
-当一个 `Field` 里需要封装多个表单元素时，一般会将多个表单元素的 value 值封装在一个对象里传入到 `Field` 中。当无法使用 `getControlGroup` 满足封装要求时，可以自己封装组件，通过调用 `Field` 组件传入的 `onChange` 事件更改 `Field` 的 value。
-
-⚠️注意：调用 `Field` 传入的 `onChange` 事件默认会覆盖原值，可以通过传入 `{ merge: true}` 参数来部分覆盖 value 值。
-
-<!-- demo-slot-4 -->
+<!-- demo-slot-15 -->
 
 ### 表单校验
 
-#### 表单校验的使用
+通过 `Field` 上的 `validators` 参数来设置表单项的校验规则；也可以在 `FieldArray` 或者 `FieldSet` 上设置校验规则，这是高级用法，请[参考这一节](#fei-field-ceng-ji-de-xiao-yan)。
 
-- `Field` 组件支持传入 `validations` 和 `validationErrors` 来指定校验规则和校验提示；
-- `validations` 对象支持预置的内部校验规则（详见[内置 validation rules](#nei-zhi-validation-rules) ）, 也支持传入自定义的校验函数，校验函数返回 `true` 时表示验证通过；
-- 可以通过 `Form.createForm` 扩展内部校验规则，详见 [`Form.createForm` API](#form-createform) 。
-- 默认在任一表单进行校验时，其他所有表单域都会进行校验。如果想修改这种默认行为，可以给 `Field` 的 `relatedFields` 属性为一组表单域的名字数组，这样当当前表单域校验时，只会校验这些指定的表单域。
+表单校验函数定义:
 
+```ts
+type AsyncValidator<T> = (
+	value: T,
+	ctx: ValidatorContext<T>
+) => Promise<IMaybeError<T>> | Observable<IMaybeError<T>> | null;
+
+type SyncValidator<T> = (value: T, ctx: ValidatorContext<T>) => IMaybeError<T>;
+```
+
+- 如果返回 `null` 或者 `undefined` 表示校验通过；当校验失败时返回一个[包含错误信息的对象](../../apidoc/interfaces/IValidateResult.html)。
+- 支持返回 `Promise` 或 `Observable` 进行异步校验
+- 使用 `Form.createAsyncValidator` 来创建一个异步校验函数，[查看函数定义](../../apidoc/classes/Form.html#createAsyncValidator)；通过 `Form.isAsyncValidator` 来判断函数是不是异步校验函数，[查看函数定义](../../apidoc/classes/Form.html#isAsyncValidator)
+- 通过 `Field` 的 `validateOccasion` 参数控制校验时机
+- 通过 `Field` 的 `getValidateOption` 参数控制校验规则的运行时机以及哪些校验规则需要运行
+- `validator` 的执行顺序是 `validators` 数组的元素顺序，通常建议把异步校验放在最后
+- `ctx` 参数上有几个获取表单值的方法，当校验依赖其他字段的值时可能需要用到
+  - `getFormValue()` 获取整个表单当前的值
+  - `getSectionValue(...names)` 获取当前 FieldSet 或者 Form 下的某个字段的值
+  - `getSection()` 或者所属 FieldSet 或者 Form 的 model 对象。
+
+#### 内置的校验规则
+
+- [`Validators.min`](../../apidoc/modules/Validators.html#min)
+- [`Validators.max`](../../apidoc/modules/Validators.html#max)
+- [`Validators.required`](../../apidoc/modules/Validators.html#required)
+- [`Validators.requiredTrue`](../../apidoc/modules/Validators.html#requiredTrue)
+- [`Validators.email`](../../apidoc/modules/Validators.html#email)
+- [`Validators.minLength`](../../apidoc/modules/Validators.html#minLength)
+- [`Validators.maxLength`](../../apidoc/modules/Validators.html#maxLength)
+- [`Validators.pattern`](../../apidoc/modules/Validators.html#pattern)
+
+<!-- demo-slot-4 -->
 <!-- demo-slot-5 -->
 
-#### 表单校验时机
+### 非 `Field` 层级的校验
 
-表单的默认校验时机是 value 值改变的时候。可以修改 `validateOnChange`，`validateOnBlur` 来改变校验时机，如在 blur 时再校验（一般用于Input输入框）。
-
-如果你需要在提交时校验表单项，可以设置 `validateOnChange`，`validateOnBlur` 都为 `false`，并使用内置表单提交操作 `handleSubmit`。如果不使用 `handleSubmit` 处理表单提交操作，你需要在表单提交时使用 `zentForm.validateForm(true, callback)` 方法强制触发表单的校验，并在 `callback` 中处理后续逻辑。如果需要自主控制错误信息的展示，可以使用 `Field` 的 `displayError` 属性来控制错误信息的显示。
-
-<!-- demo-slot-6 -->
-
-#### 异步校验
-异步校验在 blur 时触发，如果需要在自定义组件中手动触发异步校验，需要自己调用`props.onBlur(event)`。 `value` 值可以直接传给 `event` ，或者作为 `event` 的属性传入。
-
-如果在没有触发异步校验的情况下（比如没有对表单项进行过操作）直接提交表单时，默认不会触发异步校验，使用内置的 `handleSubmit` 方法可以在提交表单时触发从未进行的异步校验。如果不使用 `handleSubmit` 处理表单提交操作，你需要在表单提交时使用 `zentForm.isFormAsyncValidated` 判断表单是否经过了异步校验，并根据结果选择是否使用 `zentForm.asyncValidateForm(resolve, reject)` 方法强制触发表单的异步校验。
-
-<!-- demo-slot-7 -->
-
-### 格式化 `value`
-
-`Form` 组件提供了 `format` 和 `nomalize` 方法 来对 `value` 进行格式化，它们的执行时机详见 [value 的生命周期](#field-zhong-value-de-sheng-ming-zhou-qi)。
-
-<!-- demo-slot-8 -->
-
-### 表单操作
-
-- `Form.createForm` 为组件注入 `zentForm` 属性，提供了表单和表单元素的各种操作方法，如获取表单元素值，重置获取表单元素值等，详见 [`zenForm` API](#zentform)
-- `Form` 组件内部对表单提交的过程也进行了封装了 `handleSubmit` 方法，可以把异步提交过程封装在一个函数里并**返回 `Promise` 对象**，组件内部会根据 `Promise` 对象的执行结果分别调用 `onSubmitSuccess` 和 `onSubmitFail` 方法，同时更新内部维护的 `isSubmitting` 属性（可以通过 `zentForm.isSubmitting()` 得到）。此外，当设定 `scrollToError` 时，支持表单提交时自动滚动到第一个报错的表单域。
-
-<!-- demo-slot-9 -->
-<!-- demo-slot-10 -->
-
-### 其他
-
-#### `Form` 布局
-
-`Form` 组件提供三种简单的样式：行内布局 `inline`，水平布局 `horizontal`， 垂直布局 `vertical`。
-
-<!-- demo-slot-11 -->
-
-#### `Fieldset` 组件
-
-<!-- demo-slot-12 -->
-
-#### `FormSection` 组件
-
-`FormSection` 组件可以复用切分为更小模块的表单域，其对应的表单数据是对象形式。`FormSection` 支持的参数详见[`Form.FormSection` API](#form-formsection)。
+`FieldSet` 和 `FieldArray` 和 `Field` 一样可以设置校验规则，这些校验规则是运行在 `FieldSet` 和 `FieldArray` 层级的，能拿到下层的所有数据，可以用来实现跨 `Field` 的校验。
 
 <!-- demo-slot-13 -->
 
-#### `FieldArray` 组件
+### 校验选项
 
-`FieldArray` 组件可以方便地渲染一组相同的单元域，并且可以增加和删除单元域，类似数组中元素的添加和删除。
+校验选项共有以下几种：
 
-`FieldArray` 会为其 `component` 注入 `fields` 这个属性，可以提供单元域的遍历、增加、删除等操作，该属性支持的属性和方法详见[`Form.FieldArray` API](#form-fieldarray)。
+- `ValidateOption.Empty`：校验会往上层冒泡，但不往下递归触发校验，并且会包含没有修改过的 `Field`，不校验没有 touch 过的 `Field`，不触发异步校验
+- `ValidateOption.Default`：默认行为，等同于`ValidateOption.Empty`
+- `ValidateOption.IncludeAsync`：校验时包含异步校验
+- `ValidateOption.IncludeUntouched`：仅对满足`!!model.touched() === true`的字段进行校验
+- `ValidateOption.IncludeChildrenRecursively`：递归校验下层的 `Field`，适用于直接从 `Form`，`FieldSet` 或者 `FieldArray` 触发的校验
+- `ValidateOption.ExcludePristine`：不校验没有修改过的 `Field`
+- `ValidateOption.StopPropagation`：校验时不往上一级 `FieldSet` 或者 `FieldArray` 冒泡，冒泡会一直到最顶层的 `Form`。
+
+校验选项是一个 `BitSet`，在自定义表单组件中，使用 `Model` 上的 `validate` 方法进行校验时，使用 `|` 运算符联合所需的选项作为参数传入即可。
+
+不传参数调用 `form.validate()` 等价于 `form.validate(ValidateOption.Default)`。
+
+<!-- demo-slot-16 -->
+
+### 校验中间件
+
+校验中间件作用于**校验函数本身**，可以把它视作用来装饰函数的装饰器；通过中间件可以为内置的校验函数提供一些额外能力，例如条件校验。
+
+使用 `FieldUtils.compose` 可以将多个中间件组合成一个，文档底部有 `FieldUtils.compose` 的 API 描述。
+
+校验中间件的函数签名：
+
+```ts
+type Middleware<T> = (next: IValidator<T>) => IValidator<T>;
+```
+
+#### 内置的校验中间件
+
+- `when` 满足条件时才执行校验逻辑
+- `whenAsync` 同 `when`，适用于移步校验函数
+- `message` 根据值返回动态的错误信息
+
+<!-- demo-slot-6 -->
+
+#### 订阅校验状态
+
+这个功能虽然不是很常用，但是 Zent 提供了 2 种监听表单校验状态的方法：
+
+- `Form.FieldValid`：接收 `name` 或 `model`，将其校验状态作为 `children` 的第一个参数
+- `Form.useFieldValid`：接收 `name` 或 `model`，返回其校验状态
+- `Form.useFormValid`：接收 `ZentForm` 对象（即 `useForm` 的返回值），返回表单的校验状态
+- 订阅 `FieldArray`, `FieldSet` 或者 `Form` 的校验状态可能会导致性能问题，因为这些是容器类型，订阅它们意味着需要订阅它们内部包含的所有表单项的校验状态变化，这是一个非常耗资源并且影响性能的操作，所以不推荐大范围频繁使用；开发模式下在 console 中会有一个警告信息。
+- 当遇到订阅导致重绘次数过多的性能问题时，可以考虑使用 `useObservableBatchedEagerState` 将操作做批处理，减少重绘次数。
+
+<!-- demo-slot-19 -->
+
+### `useFieldArray` 和 `FieldSet`
+
+- `useFieldArray` 用于封装一组一样的表单项处理逻辑；`FieldSet` 用来封装一组相关的表单项处理逻辑。
+
+- 注意并没有所谓的 `FieldArray` 组件，直接使用 `Form.useFieldArray` 这个 hooks 即可。该函数有两个重载的实现，分别对应 `Form` 的两种运行模式。
+
+- `useFieldArray` 的参数定义请[参考这里](../../apidoc/classes/Form.html#useFieldArray)。
+
+- `useFieldArray` 返回值是一个 `FieldArrayModel`，通过 `children` 就能访问到所有数据，一般在 `render` 函数里对 `children` 做 `map` 操作即可。
+
+- `FieldArrayModel` 上还有一些操作方法： `push`，`pop`，`shift`，`unshift`，`splice`，类似数组上对应的方法，用于操作子元素。对 `FieldArrayModel` 内元素做增删应该使用前面说的这些方法，不应该通过 `patchValue` 来实现增删，因为 `patchValue` 只更新值，会导致内部 model 状态不一致。
+
+- `FieldSet` 组件和 `Form` 一样有两种运行模式，`View` 模式可以通过 `name` 参数指定对应的数据来源；`Model` 模式则通过 `model` 参数或者 `name` 参数显式的设置数据来源。
+
+`FieldSet` 两种模式公用的参数可以在[这里查看](../../apidoc/interfaces/IFieldSetBaseProps.html)。
+
+- `validators` 校验规则数组，按数组顺序执行，直到所有都通过或者在第一个失败的地方停止
+- `scrollAnchorRef` 表单提交时滚动到错误时的 DOM 元素的 ref(来自 `React.createRef` 或 `React.useRef`)
+- `renderError` 用于渲染整个 `FieldSet` 层面的错误
+- `children` 不解释
+
+`View` 模式额外的参数：
+
+- `destroyOnUnmount` 是否在组件 `unmount` 的时候销毁 model 对象，销毁时机依赖 React 执行时机。
+- `normalizeBeforeSubmit` 用于表单提交前格式化 `FieldSet` 值的回调函数
+- `validators` `FieldSet` 本身的校验规则列表，注意和内部 Field 的校验规则没有关系。执行的时候会按数组顺序逐个调用，直到所有都通过或者在第一个失败的地方停止
+
+<!-- demo-slot-8 -->
+
+### Builder API 和 Model 模式
+
+使用 `Form` 的 `Model` 模式需要自己手动创建 model，我们提供了 builder API 来帮助完成这个操作。每个函数返回的都是一个 `Builder` 对象，`Builder` 对象都有一个 `validators` 方法用来配置 model 的校验规则。**Builder API 都支持链式调用**。
+
+- `Form.form` 参数是个对象，用来描述整个 `Form` model 的结构, [查看函数定义](../../apidoc/classes/Form.html#form)
+- `Form.field` 参数是 `Field` 的默认值，[查看函数定义](../../apidoc/classes/Form.html#field)
+- `Form.set` 参数是个对象，用来描述这个表单集合的结构，[查看函数定义](../../apidoc/classes/Form.html#set)
+- `Form.array` 参数是一个其他函数返回的 `Builder` 对象，`array` 返回的 `Builder` 对象上有 `defaultValue` 用于设置这个 array 中的表单项的默认值，[查看函数定义](../../apidoc/classes/Form.html#array)
+
+<!-- demo-slot-9 -->
+
+### Model 模式动态增加/删除表单项
+
+有些联动的场景需要在表单项变化的时候动态删除或者增加表单项，我们提供了一组 API 来支持这类使用场景。
+
+每个 model 上都有一个 `builder` 的属性，通过这个属性能够获取到这个 model 对应的 builder 对象，通过 `builder.build()` 方法就可以可以生成一个行为一样的 model 对象。注意，`builder` 对象仅在通过上述 `Builder` API 生成的 model，`View` 模式下的 model 上这个属性永远是空的。
+
+除此之外，`FieldSetModel` 以及 `FormModel` 上提供了两个方法用来完成子 model 的删除和增加：
+
+- `removeChild<T extends keyof Children>(name: T): Children[T] | null`
+- `registerChild(name: string, model: BasicModel): void`
+
+`FieldArrayModel` 的 `push`, `unshift` 以及 `splice` 方法也支持直接传入 model。
+
+由于 `FieldArrayModel`, `FieldSetModel` 和 `FormModel` 子 model 的增删需要触发组件重绘，因此提供了额外的 hook 来处理：
+
+- `Form.useFieldArrayChildModels`
+- `Form.useNamedChildModel(parent: FieldSetModel, name: string): BasicModel`，注意 `FormModel` 是 `FieldSetModel` 的子类，所以也适用于这个方法。
+	
+这两个 hook 不监听子 model 内部状态的变化，如有需要，需使用它们返回的 model 对象自行调用 `useField` 等 hook 来实现。
+
+通过结合上述这些能力，就可以完成 `Model` 模式下表单项的动态增删了。
+
+<!-- demo-slot-22 -->
+
+### 表单值的格式化
+
+- 可以通过 `normalize` 和 `format` 参数来格式化 `Field` 的输入输出
+- 也可以使用 `normalizeBeforeSubmit` 属性和 `form.getSubmitValue()` 方法，在不改变 model 内存储值的情况下修改表单提交的值
+
+<!-- demo-slot-11 -->
+
+### 读取/订阅表单值
+
+试想一个使用场景：我们要实现一个活动编辑器，右侧是编辑框，左侧是实时预览；这种场景下除了需要一个地方来输入表单的各个值之外，还需要在另外一个地方读取这些表单值。我们提供了一套统一的简单易用，并且使用姿势和 `Field` 非常相似的 API 来实现组件值的按需读取。这些组件只会监听所需的数据变化，不会因为没有监听的表单项变化了而产生重绘。
+
+- `Field` 组件对应 `FieldValue`，`View` 模式下指定一个 `name`；`Model` 模式下指定一个 `model`
+- `FieldSet` 组件对应 `FieldSetValue`，只有一个 `name` 参数；如果是 `Model` 模式下已经拿到对应的 model 对象了，那么直接将 `model.get(xxx)` 传给 `FieldValue` 组件即可
+- `Form.useFieldArray` 对应 `useFieldArrayChildModels`，`View` 模式下指定一个 `name`；`Model` 模式下指定一个 `model` 或者 `name`。注意，它只会监听 `children` 的增、删行为，不会监听 `children` 内部的变动
+- `Form.useFieldValue` 提供了一种 hooks 的风格来获取表单值（包括 FieldSet、FieldArray、Field），它可以深度监听表单值
+- `Form.useFormValue` 提供了一种 hooks 的风格来获取整个表单的值，它可以深度监听表单值
+
+<!-- demo-slot-12 -->
+<!-- demo-slot-20 -->
+
+⚠️ 注意：订阅单个表单项的值一般不会有什么问题，但是订阅 `FieldArray`, `FieldSet` 或者 `Form` 的值时需要谨慎，因为这些是容器类型，订阅它们意味着需要订阅它们内部包含的所有表单项的变化，这是一个非常耗资源并且影响性能的操作，所以不推荐大范围频繁使用。针对这个问题，开发模式下会有一个警告信息来提醒使用者。
+
+当遇到订阅导致重绘次数过多的性能问题时，可以考虑使用 `useObservableBatchedEagerState` 将操作做批处理，减少重绘次数。
+
+下面这个示例的场景比较特殊，在 useCallback 的回调中同步触发重绘的话 React 会自动合并无用的重绘；但是如果在异步代码中触发重绘的话 React 并不会自动合并，导致大量重绘操作在短时间内触发，引起性能问题。
+
+此时可用使用 `useObservableBatchedEagerState` 来合并 Observable 的修改，从而间接的减少 React 重绘，优化性能。
+
+<!-- demo-slot-23 -->
+
+### 通过 Model 订阅数据
+
+`useFieldValue` 传入 Model 类型参数时不依赖 `FormContext`，因此也可以在表单外部监听数据变更。
+`useModelValue` 和 `useModelValid` 已经废弃，不推荐使用，它们的使用场景就是在表单外部通过 Model 对象订阅数据变化。
+
+<!-- demo-slot-21 -->
+
+### 表单值联动
 
 <!-- demo-slot-14 -->
 
-### 组件原理
+### 自定义表单项
 
-本组件核心由以下几部分组成：
+实现自定义 `Field` 的时候会用到这些组件，它们只是样式组件，用来提供和内置 `Field` 组件一致样式和参数。
 
-- `createForm` 函数：用来构建一个高阶组件，其中维护了表单中的所有表单元素（`Field` 组件）实例。通过向子组件的 `props` 中注入 `zentForm` 属性来提供表单和表单元素的各种操作方法。
-- `Form` 组件：作为整个表单的最顶层骨架，是对 `<form>` 标签的简单封装，定义了默认的 class 来提供基础样式。
-- `Field` 组件：用来封装各种表单元素组件（如 `Input` 、 `Checkbox` 、`Select` 以及各种自定义组件）的一个高阶组件。其中维护了表单元素 value 值和校验错误等信息。Field 组件会向表单元素组件传入封装过的 `onChange` 、`onBlur` 回调和 `value` 、`error` 等表单元素需要的 props 。
+- `Control` 封装了 label、自定义组件以及错误信息的结构，[查看 Props 文档](../../apidoc/interfaces/IFormControlProps.html)
+- `Label` 表单项的 label 组件，适用于连 `Control` 也不想使用的场景，[查看 Props 文档](../../apidoc/interfaces/ILabelProps.html)
+- `Error` 表单项的错误信息组件，同 `Label` 一样适用于深度自定义的场景，[查看 Props 文档](../../apidoc/interfaces/IFormErrorProps.html)
+- `useFormChild` 使用上述组件时，如果希望支持自动滚动到错误处，需要在组件内使用这个 Hook 关联 model 和 DOM 节点，[查看文档](../../apidoc/modules.html#useFormChild)
+- `CombineErrors` 这个组件用来将多个字段的错误聚合成一个错误展示，需要配合 `Field` 的 `withoutError` 参数使用，[查看 Props 文档](../../apidoc/interfaces/ICombineErrorsProps.html)
 
-具体的使用，详见 [API 说明](#api)。
+<!-- demo-slot-18 -->
+<!-- demo-slot-3 -->
+<!-- demo-slot-10 -->
 
-### 其他说明
+### `Form` 布局
 
-#### 封装自定义的表单元素组件
-- `Field` 的展示完全由传入到 `component` 属性中的组件所控制。这个组件能够接收到所有从 `Field` 传入的 props （包括 `Field` 中构造的一些隐含的 props ，具体[`Form.Field` API](#form-field) ）。
+`Form` 组件使用 `flex` 布局，有两个参数控制基本的布局结构
 
-- 对于一些常用的 `zent` 表单组件， `Form` 组件已经使用了 `getControlGroup` 函数进行了封装。如果产品设计上有一些特殊的需求，或者需要封装自定义的组件，也可以直接使用或者参考 `getControlGroup`的方式来对组件进行封装， 参考 [demo 封装多个表单元素](#duo-ge-biao-dan-yuan-su-de-feng-zhuang)。
+- `layout` 控制**表单项内**的布局方式，支持水平 `horizontal` 和垂直 `vertical` 两种布局
+- `direction` 控制**表单项间**的排列方式，支持 `column` 和 `row` 两种排列。 
 
-- **如果需要在一个 `Field` 中展示多个表单元素，可以将所有的表单元素封装在一个对象中传入 Field 的value 中。具体可以参考 [demo 封装多个表单元素](#duo-ge-biao-dan-yuan-su-de-feng-zhuang)。**
+水平排列通常来说需要设置表单项的**最小宽度**才能正常工作，可以通过 `FormContext` 中的 `controlStyle` 来批量设置。
 
-#### `Field` 中 `value` 的生命周期
-- 表单元素的初始值需要通过在 `Field` 中指定 `value` 值传入。 `value` 值的生命周期如下图所示：
+<!-- demo-slot-7 -->
 
-```
-Field 中传入 value ---> 使用 format() 格式化 value ---> format 过的 value 传入 component 中渲染组件
-															 ↑                                 |
-															 |                                 ↓
-															 |                          用户操作改变 value
-															 |                                 |
-															 |                                 ↓
-		normalize 过的 value 写入 form 中维护, 用于数据提交 <--- 使用 normalize() 格式化 value
-```
+### 表单上下文
 
-- 如果传入 `Field` 的 `value` 值是一个动态值，在外部改变 value 后会重新开始 value 的生命周期。
+使用`FormContext`对整个表单的行为进行控制，目前支持对 `Label` 组件以及 `Control` 组件进行样式自定义。
 
-### API
-
-#### **`Form`**
-
-对 html 中 form 元素的一个简单封装, 提供默认的 className.
-
-| 参数 | 说明 | 类型 | 默认值 | 是否必填 |
-|------|------|------|--------|--------|
-| className | 自定义额外类名 | string | `''` | 否 |
-| prefix | 自定义前缀 | string | `'zent'` | 否 |
-| vertical | 垂直排列布局 | boolean  | `true` | 否 |
-| horizontal | 水平排列布局 | boolean  | `false` | 否 |
-| inline | 行内排列布局 | boolean | `false` | 否 |
-| onSubmit | 表单提交回调 | func(e:Event) | `noop` | 否 |
-| style | 内联样式 | object | null | 否 |
-| disableEnterSubmit | 禁止回车提交表单 | boolean | `true` | 否 |
-
-#### **`Form.createForm`**
-
-##### **使用方式：`Form.createForm(options)(FormComponent)`**
-
-##### **`options`**
-
-`options` 支持的配置项如下:
-
-| 参数 | 说明 | 类型 | 是否必填 |
-|------|------|------|------|
-| formValidations | 用于添加自定义校验方法, 通过这种方式添加的方法在 validations 中使用时可以传额外的参数 | object | 否 |
-
-⚠️注意：项目中的通用校验方法，可以通过在一个文件中定义公共的`formValidations`对象后引入。
-
-##### **`createForm` 返回组件中可接收的 props**
-
-`createForm` 方法构建了一个高阶组件，该组件可以定义了一些额外的 props 。
-
-| 参数 | 说明 | 类型 | 默认值 |是否必填 |
-|------|------|------|------|------|
-| onChange | 任意表单元素修改后触发的回调，参数为所有表单元素值的对象 | func(values: Object) | noop | 否 |
-| onSubmitSuccess | 提交成功后的回调，参数是 submit 函数中 promise 的返回值 | func(submitResult: any) |noop | 否 |
-| onSubmitFail | 提交失败后的回调，参数要么是 SubmissionError 的一个实例，要么是 undefined | func(submitError: SubmissionError) |noop | 否 |
-| scrollToError | 表单提交时或者设置外部错误时，表单自动滚动至第一个报错表单域 | boolean | `false` | 否 |
-
-⚠️注意：
-
-1. `onChange`, `onSubmitSuccess`, `onSubmitFail`, `scrollToError` 也支持通过 `createForm` 的 `options` 参数传入；
-2. 想要获取被 createForm 包裹的 FormComponent 的实例，可以在 createForm 创建的组件上添加 ref 然后调用`getWrappedForm`方法获取到。
-
-##### **`zentForm`**
-
-经过 `Form.createForm` 包装的组件通过 props 被添加了 `zenForm` 属性, 可以通过 `this.props.zentForm` 访问, `zentForm` 提供的 API 如下：
-
-| 参数 | 说明 | 类型 |
-|------|------|------|
-| getFormValues | 获取与 form 绑定的所有表单元素值 | func |
-| getFieldError | 获取某个 Field 的错误信息, 没有报错信息返回空 | func(name: String) |
-| setFormDirty | 设置所有 Field 的状态为非原始状态, 用于在提交表单时让 Field 把没有显示出来的错误显示出来 | func(isDirty: Boolean) |
-| setFieldExternalErrors | 设置外部传入的错误信息（比如服务端校验错误）， errors 的 key 为 Field 的 name ， value 为错误文案 | func(errors: Object) |
-| setFieldsValue | 设置表单 Field 的值为指定值 | func(data: Object) |
-| resetFieldsValue | 把所有 Field 的值恢复到指定值或初始状态 | func(data: Object) |
-| initialize | 设置表单 Field 初始值 | func(data: Object) |
-| isValid | 表单的所有 Field 是否都通过了校验 | func |
-| isSubmitting | 表单是否正在提交 | func |
-| isValidating | 表单是否有 Field 在异步校验 | func |
-| isFieldDirty | Field 是否变更过值 | func(name: String) |
-| isFormAsyncValidated | 所有 field 是否都进行了异步校验 | func |
-| validateForm | 强制表单进行同步校验 | func(forceValidate: Boolean, callback: Function, relatedFields: Array) |
-| asyncValidateForm | 强制表单进行异步校验 | func(resolve: Function, reject: Function) |
-| isFormSubmitFail | 表单是否提交失败，初始时为 `false` | func |
-| isFormSubmitSuccess | 表单是否提交成功, 初始时为 `true` | func |
-| updateFormSubmitStatus | 更新表单提交成功、失败状态 | func(submitSuccess: Boolean) |
-
-##### **`handleSubmit`**
-
-`createForm` 还会为被包装的组件提供一个封装过的 `handleSubmit` 方法，具体使用可以参考[demo 表单操作](#biao-dan-cao-zuo)。
-
-⚠️注意：如果希望在 `onSubmitFail` 回调中正确接收到 `error` 对象，需要在 `submit` 函数中抛出一个 `SubmissionError` 类型的对象
-
-```jsx
-const { SubmissionError } = Form;
-
-submit() {
-	// do submit
-	...
-	throw new SubmissionError('error message');
-}
-
-onSubmissionFail(submissionError) {
-	if (submissionError && submissionError.errors === 'error message') {
-		// do something
-	}
+```ts
+interface IZentFormContext {
+	labelStyle?: CSSProperties;
+	controlStyle?: CSSProperties;
 }
 ```
 
-#### **`Form.Field`**
+<!-- demo-slot-17 -->
 
-所有需要维护 `value` 的表单元素组件都需要通过 `Field` 组件包装一下。
-在 `Field` 组件上可以传入以下 props ，`component` 以外的其他 props （包括自定义的 props ），都会传入到 `component` 中所定义的表单元素组件中：
+### `FieldUtils`
 
-| 参数 | 说明 | 类型 | 是否必填 |
-|------|------|------|------|
-| name | 表单元素名 | string | 是 |
-| component | 真正的表单元素组件，负责表单元素如何展示。可以是字符串(标准 html 元素名), 或者 React 组件 | string / React.Component | 是 |
-| value | 表单元素初始值 | any | 是 |
-| normalize | onChange 或者 onBlur 后格式化表单元素值 | func(value, previousValue, nextValues, previousValues) | 否 |
-| format | 渲染前格式化表单元素值, 不影响真正存储的表单元素值 | func(value, previousValue, nextValues, previousValues) | 否 |
-| onChange | value 值修改后的回调，会在 Field 中封装一层。(自定义组件需要自己调用由 Field 组件封装后传入的 `props.onChange()` 后才会执行) | func(event, newValue, previousValue, preventSetValue) | 否 |
-| onBlur | blur 后的回调（会在 Field 中封装一层） | func(event, newValue, previousValue, preventSetValue) | 否 |
-| onFocus| focus 后的回调（会在 Field 中封装一层） | func(event) | 否 |
-| validations | 定义表单元素校验方法 | object | 否 |
-| validationErrors | 定义表单元素检验方法对应的出错信息 | object | 否 |
-| validateOnChange | 是否在触发change事件时执行表单校验 | boolean | 否 |
-| validateOnBlur | 是否在触发blur事件时执行表单校验 | boolean | 否 |
-| clearErrorOnFocus | 是否在触发focus事件时清空错误信息 | boolean | 否 |
-| asyncValidation | 异步校验 func, 需要返回 Promise | func(values, value) | 否 |
-| displayError | 显示错误信息 | boolean | 否 |
-| relatedFields | 当前表单域对哪些表单域的校验有影响 | array | 否 |
+`FieldUtils` 提供了一些有用的工具函数，如果不知道干什么用的或者看不懂，说明你没有需求，不需要用到它们，这些工具本身定位就是高级用法。
 
-除了上述参数之外， `Field` 组件会隐含地向被包裹的表单元素组件中传入以下 props ：
-
-| 参数 | 说明 | 类型 |
-|------|------|------|
-| isDirty | 表单元素值被改变过 | boolean |
-| isActive | 表单元素为input且获得了焦点 | boolean |
-| error | 第一个校验错误文本信息（没有报错时为 null ） | string / Null |
-| errors | 校验错误文本信息数组（没有错误时为空数组） | array |
-
-##### **获取 `Field` 对应 `component` 的实例**
-
-可以通过在 `Field` 上加上 `ref`，然后调用 `getWrappedComponent` 方法来获取。
-```
-<Field
-	ref={ref => { this.field = ref }}
-	component={XxxComponent}
-	...
-/>
-
-const component = field.getWrappedComponent();
-```
-
-#### **`Form.getControlGroup`**
-`getControlGroup` 是一个用来快速封装自定义组件的函数，它返回一个满足通用布局与样式要求（左侧标签 、右侧表单元素）的stateless functional component 。同时支持将 `Field` 中的 错误提示信息展示出来。
-
-封装过的组件支持在 `Field` 上额外传入以下参数：
-
-| 参数 | 说明 | 类型 | 是否必填 |
-|------|------|------|------|
-| label | 表单元素的label | string / React.Component | 否 |
-| className | 添加到control-group 上的额外类名，可以用来覆盖子元素的样式 | string | 否 |
-| helpDesc | 表单元素的说明性文字 | string / React.Component | 否 |
-| notice | 表单元素的重要提示性文字 | string / React.Component | 否 |
-| required | 为 true 时会在 label 前添加红色的"*" | boolean | 否 |
-
-##### **获取 `Control` 组件实例**
-
-参照上方获取 `Field` 对应 `component` 的实例，然后调用 `getControlInstance` 方法。
-```jsx
-const component = field.getWrappedComponent().getControlInstance();
-```
-
-#### **`Form.FormSection`**
-
-`FormSection` 提供以下参数：
-
-| 参数 | 说明 | 类型 | 默认值 | 是否必填 |
-|------|------|------|-----|------|
-| name | 表单块的名字 | string | 无 | 是 |
-| component | 包裹 `FormSection` 的 html 标签 | string |  `'div'` |否 |
-| children | 表单块的子元素 | string / React.Component | 无 | 否 |
-
-#### **`Form.FieldArray`**
-
-`FieldArray` 组件支持如下：
-
-| 参数 | 说明 | 类型 | 是否必填 |
-|------|------|------|-----|------|
-| name | `FieldArray` 的名字 | string | 是 |
-| value | 组件的值 | array | 否 |
-| component | `FieldArray` 中展示的表单元素组件，可以是字符串(标准 html 元素名), 或者 React 组件 | string / React.Component | 是 |
-
-`FieldArray` 会为其 `component` 注入 `fields` 属性并提供表单域数组的遍历、增加、删除等功能，其 API 如下所示：
-
-| 参数 | 说明 | 类型 |
-|------|------|------|
-| name | `FieldArray` 的名字 | string |
-| length | `FieldArray` 中表单域数组的长度 | number |
-| forEach | 遍历 `FieldArray` 中表单域数组 | (callback: Function) => any |
-| get | 获取 `FieldArray` 中表单域数组中某一项的值 | (index: Number) => any |
-| getAll | 获取 `FieldArray` 中表单域数组的所有值 | func |
-| map | 遍历 `FieldArray` 中表单域数组 | (callback: Function) => any|
-| move | 移动 `FieldArray` 中表单域数组的某一项 | (fromPos: Number, toPos: Number) => any |
-| pop | 删除 `FieldArray` 中表单域数组的最后一项 | func |
-| push | 在 `FieldArray` 中表单域数组末尾添加一项 | (value: Object/String) => any |
-| remove | 删除 `FieldArray` 中表单域数组中的某一项 | (index: Number) => any |
-| removeAll | 删除 `FieldArray` 中整个表单域数组 | func |
-| shift | 删除 `FieldArray` 中表单域数组的第一项 | func |
-| swap | 交换 `FieldArray` 中表单域数组的某两项 | (indexA: Number, indexB: Number) => any |
-| unshift | 在 `FieldArray` 中表单域数组的头部添加一项 | (value: Object/String) => any |
-| concat | 在 `FieldArray` 中表单域数组末尾连接一个数组, 如果传入的不是数组，则会被添加到末尾 | (value: Object/String/Array) => any |
-| replaceAll | 将 `FieldArray` 中表单域数组全部替换为传入的参数 | (value: Array) => any |
-
-⚠️注意：遍历的回调函数 callback 将接受五个参数: item（`FieldArray` 中当前项的名字），index（`FieldArray` 中当前项的次序），key（`FieldArray` 中当前项的唯一 key 值），value（`FieldArray` 中当前项的值）， fieldsValue（`FieldArray` 的所有值）。为了保证 `FieldArray` 在删除和添加时数据正确，遍历时一定要给 `component` 中的子节点设置正确的 `name` 和 `key`, 详见使用参考 [FieldArray 基本使用](#fieldarray-zu-jian)
-
-#### **内置 validation rules**
-可以直接在 `Field` 的 `validations` 属性中使用，使用方法参考 [demo 常用表单校验](#biao-dan-xiao-yan-de-shi-yong)。内置规则如下：
-
-| 规则名 | 说明 | 可传参数 |
-|------|------|------|
-| required | 是否必填 | 任意，传 true 是为了表意，传其他值也是当作必填，下同 |
-| isExisty | 是否非 null ，非 undefined | 任意 |
-| matchRegex | 是否匹配指定正则表达式 | Regex |
-| isEmail | 是否邮件类型字符串 | 任意 |
-| isUrl | 是否 url 类型 | 任意 |
-| isTrue | 是否true | 任意 |
-| isFalse | 是否false | 任意 |
-| isNumeric | 是否数字类型 | 任意 |
-| isInt | 是否整数 | 任意 |
-| isFloat | 是否小数 | 任意 |
-| isLength | 字符串或数组是否为指定长度 | 长度值(Number) |
-| equals | 是否与指定值相等 | 指定值 |
-| equalsField | 是否与表单中的其他元素值相等 | 其他 Field 的name(String) |
-| maxLength | 字符串或数组不能超过指定长度 | 长度值(Number) |
-| minLength | 字符串或数组不能小于指定长度 | 长度值(Number) |
+- useMulti 用来按顺序调用一批函数，只使用它们的副作用，忽略返回值，[查看函数定义](../../apidoc/modules/FieldUtils.html#useMulti)
+- usePipe 用来从左往右按顺序调用一批函数，上一个函数的返回值作为下一个函数的参数，返回最后一个函数的返回值，[查看函数定义](../../apidoc/modules/FieldUtils.html#usePipe)
+- useCompositionHandler 用来在 `model` 上维护一个输入法编辑的状态, `model.isCompositing`，[查看函数定义](../../apidoc/modules/FieldUtils.html#useCompositionHandler)。组件内部会根据这个状态在输入法输入阶段跳过校验
+- useChangeHandler 生成一个 `onChange` 回调函数，具体说明请[查看函数定义](../../apidoc/modules/FieldUtils.html#useChangeHandler)
+- compose 与 usePipe 类似，区别是 usePipe 作为 hook 使用，而 compose 可以用在任何地方，例如组合多个校验函数中间件，[查看函数定义](../../apidoc/modules/FieldUtils.html#compose)

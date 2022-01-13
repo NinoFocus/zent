@@ -1,7 +1,7 @@
 ---
-order: 10
+order: 11
 zh-CN:
-	title: 可扩展模式
+	title: 可展开模式
 en-US:
 	title: Flexible
 ---

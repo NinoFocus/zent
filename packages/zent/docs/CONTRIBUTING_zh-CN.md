@@ -3,6 +3,7 @@
 #### 初始化项目:
 
 ```bash
+# 请确保安装 coreutils，OSX 可以使用 brew 安装
 yarn bootstrap
 ```
 
@@ -20,7 +21,6 @@ packages/zent
 ├── docs            # 一些文档
 ├── scripts         # 一些脚本，用于测试、发布等
 ├── src             # 组件源码
-├── typings         # typescript 的定义文件
 ```
 
 #### 添加新组件
@@ -31,11 +31,8 @@ packages/zent
 - 添加样式代码
 - 添加测试代码
 - 添加文档
-- 添加 Typescript 的定义
 
 我们提供了一个脚本来自动化大部分初始化工作，在 `packages/zent` 目录下执行 `yarn new-component YOUR-COMPONENT-NAME`，脚本会自动创建组件需要的目录和样板代码。
-
-代码写完之后还需要在 `packages/zent/typings` 目录下添加新组建对应的 Typescript 类型定义。
 
 #### 文件命名
 
@@ -46,7 +43,7 @@ packages/zent
 
 #### 本地测试
 
-`__tests__` 里面只是单元测试，本地测试请在本地运行文档网站，确保每次修改代码文档都回有相应的更新。
+`__tests__` 里面只是单元测试，本地测试请在本地运行文档网站，确保每次修改代码文档都会有相应的更新。
 
 我们的原则是：文档即代码。
 
@@ -87,6 +84,6 @@ yarn test-component button
 `z-index` 优先级（从高到低）：
 
 * 特殊组件：Notify 永远在最上面，[10000, +∞)
-* 小范围的 ‘用完就关’ 的组件：Pop, Select, Datetimepicker, ColorPicker, Cascader 等 [2000, 3000)
+* 小范围的 ‘用完就关’ 的组件：Pop, Select, DatePicker, ColorPicker, Cascader 等 [2000, 3000)
 * 全屏幕的组件：Dialog, image-preview 等 [1000, 2000)
 * 其他：组件内部用来控制层次的 z-index 的区间 [-10, 10]，尽可能写小，一般1，2，3这种就够了。

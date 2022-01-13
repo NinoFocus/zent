@@ -1,7 +1,6 @@
-const { resolve } = require('path');
+const path = require('path');
 const webpack = require('webpack');
 const WebpackDevServer = require('webpack-dev-server');
-const ProgressPlugin = require('webpack/lib/ProgressPlugin');
 const cp = require('child_process');
 
 const webpackConfig = require('../webpack/webpack.dev.config.js');
@@ -16,15 +15,7 @@ let onceMark = true;
 
 const compiler = webpack(webpackConfig);
 
-compiler.apply(
-  new ProgressPlugin({
-    format: '  build [:bar] :percent (:elapsed seconds)',
-    clear: false,
-    width: 60,
-  })
-);
-
-compiler.plugin('done', () => {
+compiler.hooks.done.tap('DevBannerPlugin', () => {
   if (onceMark) {
     cp.exec(`${cmds[process.platform]} http://127.0.0.1:4396`);
   }
@@ -36,7 +27,7 @@ const server = new WebpackDevServer(compiler, {
     colors: true,
   },
   hot: true,
-  contentBase: resolve(__dirname, 'dist'),
+  contentBase: path.resolve(__dirname, '../dist'),
   publicPath: '/',
   disableHostCheck: true,
   inline: true,
@@ -45,5 +36,5 @@ const server = new WebpackDevServer(compiler, {
 
 server.listen(4396, '0.0.0.0', () => {
   // eslint-disable-next-line
-  console.log('\n Starting server on http://localhost:4396 \n');
+  console.log('\n Starting server on http://127.0.0.1:4396 \n');
 });

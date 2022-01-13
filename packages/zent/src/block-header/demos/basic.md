@@ -18,7 +18,6 @@ class Simple extends React.Component {
 				<BlockHeader
 					title="{i18n.content}"
 					tooltip={<span>test</span>}
-					content={<a href="/">content</a>}
 					position="top-center"
 				/>
 				<br />
@@ -26,21 +25,22 @@ class Simple extends React.Component {
 					className="test-class"
 					title="{i18n.content}"
 					position="top-center"
-				>
-					<a href="/">children</a>
-				</BlockHeader>
+					leftContent={
+						<a className="zent-link" href="/">
+							left content
+						</a>
+					}
+				/>
 				<br />
 				<BlockHeader
 					title="{i18n.content}"
-					tooltip={
-						<div>
-							<p>test1</p>
-							<p>test2</p>
-						</div>
-					}
-					content={<a href="/">content</a>}
+					tooltip={<span>test</span>}
 					position="top-center"
-					childAlign="right"
+					rightContent={
+						<a className="zent-link" href="/">
+							right content
+						</a>
+					}
 				/>
 				<br />
 				<BlockHeader
@@ -48,10 +48,17 @@ class Simple extends React.Component {
 					title="{i18n.content}"
 					tooltip={<span>test</span>}
 					position="top-center"
-					childAlign="right"
-				>
-					<a href="/">children</a>
-				</BlockHeader>
+					leftContent={
+						<a className="zent-link" href="/">
+							left content
+						</a>
+					}
+					rightContent={
+						<a className="zent-link" href="/">
+							right content
+						</a>
+					}
+				/>
 			</div>
 		);
 	}

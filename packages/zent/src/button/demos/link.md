@@ -11,13 +11,15 @@ en-US:
 ---
 
 ```jsx
-import { Button, Alert } from 'zent';
+import { Button } from 'zent';
 
 ReactDOM.render(
 	<div>
 		<Button href="https://youzan.com">{i18n.index}</Button>
-		<Button href="https://youzan.com" target="_blank">{i18n.newWindow}</Button>
-	</div>
-	, mountNode
+		<Button href="https://youzan.com" target="_blank">
+			{i18n.newWindow}
+		</Button>
+	</div>,
+	mountNode
 );
 ```

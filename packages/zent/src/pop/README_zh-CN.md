@@ -22,8 +22,9 @@ group: 反馈
 |------|------|------|--------|--------|-----|
 | content | 弹层的内容 | node | 是 | | |
 | trigger | 触发方式 | string | 否 | `'none'` | `'click'`, `'hover'`, `'focus'` |
-| position | 弹出框的位置，命名规则：相对触发元素的位置+箭头相对于Pop的位置 | string | 否 | `'top-center'` |  |
+| position | 弹出框的位置，命名规则：相对触发元素的位置+箭头相对于Pop的位置。接受函数形式，参考 `Popover.Position.create` | string \| func | 否 | `'top-center'` |  |
 | centerArrow | 是否按小箭头居中对齐trigger来定位 | bool | 否 | `false` |  |
+| cushion | 与 Popover 中的`cushion`含义（定位的偏移量）相同，通常为弹框边缘与 trigger 元素之间的距离 | number | 否 | `10` |  |
 | header | 用户可以自定义头部 | node | 否  | | |
 | block | 弹层在文档流里是否以块级元素出现 | bool | 否 |  `false` |  |
 | onShow | 弹层打开后的回调函数 | func | 否 | `noop` | |
@@ -34,14 +35,14 @@ group: 反馈
 | onCancel | 用户使用 confirm 的时候可自定义取消的回调 | func | 否  |  |  |
 | confirmText | 用户自定义按钮名 | string | 否 | `'确定'` |  |
 | cancelText | 用户自定义取消按钮 | string | 否 | `'取消'` |  |
-| type | 影响确定按钮的样式 | string | 否  | `'primary'` | `'default'`, `'danger'`, `'success'` |
+| type | 影响确定按钮的样式 | string | 否  | `'primary'` | `'default'`                          |
 | visible | 外部维护 `Pop` 的显示状态，此时外部拥有 `Pop` 的全部控制权，必须和 `onVisibleChange` 一起使用 | bool | 否 |  | |
 | onVisibleChange | 和 `visible` 一起使用 | func | 否 | | |
 | onPositionUpdated | 位置更新时的回调，不保证调用这个函数时位置一定变化 | func | 否 | `noop` | |
 | onPositionReady | 位置进入窗口时的回调，生命周期内只调用一次 | func | 否 | `noop` | |
-| className | 自定义类名 | string | 否 | `''` |  |
-| wrapperClassName | 自定义trigger包裹节点的类名 | string | 否 | `''` |  |
-| prefix | 自定义前缀 | string | 否 | `'zent'` |  |
+| containerSelector | 弹层的父节点CSS selector | string | 否 | `'body'` | 所有合法的CSS selector | |
+| className | 弹层自定义类名 | string | 否 |  |  |
+| style | 弹层自定义样式 | `CSSProperties` | 否 |  |  |
 
 根据 `trigger` 值的不同, `Pop` 提供了一些额外的控制参数.
 
@@ -50,7 +51,6 @@ group: 反馈
 | 参数 | 说明 | 类型 | 是否必须 | 默认值 |
 |------|------|------|--------|-------|
 | closeOnClickOutside | 点击弹层和trigger节点外部时自动关闭 | bool | 否 | `true` |
-| isOutside | 用来判断点击目标是否在外面的可选函数 | func | 否 | |
 
 #### Hover
 
@@ -58,8 +58,19 @@ group: 反馈
 |------|------|------|--------|-------|
 | mouseEnterDelay | hover打开的延迟（单位：毫秒） | number | 否 | `200` |
 | mouseLeaveDelay | 关闭的的延迟（单位：毫秒） | number | 否 | `200` |
-| isOutside | 用来判断点击目标是否在外面的可选函数 | func | 否 | |
-| quirk | 开启 Popover 的 quirk 模式，该模式下判断关闭条件时不需要先从内部移动出去 | bool | 否 | `true` |
+| anchorOnly | 仅考虑 Trigger 作为触发区域 | boolean | 否 | `false` |
+| fixMouseEventsOnDisabledChildren | 兼容处理被禁用的子节点的鼠标事件 | boolean | 否 | `false` |
+
+**注意：**`fixMouseEventsOnDisabledChildren` 仅对 Zent 组件有效。
+
+背景
+
+- [原生 `input` 和 `button` 在 disabled 状态下触发鼠标事件失效](https://github.com/youzan/zent/issues/142)
+
+解决方案
+
+- 先将元素 `input` 或 `button` 包裹在另一元素内部
+- 再给元素 `input` 或 `button` 加样式 `{pointer-events: none}`
 
 #### None
 
@@ -83,6 +94,11 @@ group: 反馈
 用于获取内部的 `Popover` 实例。
 
 ### FAQ
+
+
+#### 内容区文本很长的时候定位错误
+
+这个问题基本都是因为 `content` 直接传入了一个很长的字符串，导致组件在 `body` 上测量得到的弹层宽度和实际渲染宽度不一致导致的，因为这个折行行为和弹层与屏幕边缘的位置相关。解决方法是给 `content` 一个宽度。
 
 #### centerArrow
 

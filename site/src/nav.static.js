@@ -13,10 +13,10 @@ module.exports = {
                 "DocLoadable({ loader: () => import('../../packages/zent/README_zh-CN.md') })",
             },
             {
-              title: '项目示例',
-              path: 'guides/demos',
+              title: 'Babel 插件',
+              path: 'guides/babel-plugin-zent',
               source:
-                "DocLoadable({ loader: () => import('../../packages/zent/docs/DEMO_zh-CN.md') })",
+                "DocLoadable({ loader: () => import('../../packages/babel-plugin-zent/README_zh-CN.md') })",
             },
             {
               title: '国际化',
@@ -25,28 +25,31 @@ module.exports = {
                 "DocLoadable({ loader: () => import('../../packages/zent/docs/I18N_zh-CN.md') })",
             },
             {
-              title: 'babel-plugin-zent',
-              path: 'guides/babel-plugin-zent',
-              hidden: true,
-              source:
-                "DocLoadable({ loader: () => import('../../packages/babel-plugin-zent/README_zh-CN.md') })",
+              title: 'API文档',
+              link: 'apidoc',
             },
           ],
         },
         {
           groupName: '主题',
           list: [
-            {
-              title: '色彩',
-              path: 'guides/colors',
-              source:
-                "DocLoadable({ loader: () => import('./pages/colors/zh-CN.js') })",
-            },
+            // {
+            //   title: '色彩',
+            //   path: 'guides/colors',
+            //   source:
+            //     "DocLoadable({ loader: () => import('./pages/colors/zh-CN.js') })",
+            // },
             {
               title: '定制主题',
               path: 'guides/theme',
               source:
-                "DocLoadable({ loader: () => import('../../packages/zent/docs/THEME_zh-CN.md') })",
+                "DocLoadable({ loader: () => import('../../packages/zent/src/theme/README_zh-CN.md') })",
+            },
+            {
+              title: '编码规范',
+              path: 'guides/writing-themable-code',
+              source:
+                "DocLoadable({ loader: () => import('../../packages/zent/docs/Theme-Coding_zh-CN.md') })",
             },
           ],
         },
@@ -60,11 +63,16 @@ module.exports = {
                 "DocLoadable({ loader: () => import('../../packages/zent/RELEASE_zh-CN.md') })",
             },
             {
-              title: 'Github 日志',
-              path: 'guides/github_changelog',
-              hidden: true,
+              title: '9.0.0 迁移指南',
+              path: 'guides/changelog-v9',
               source:
-                "DocLoadable({ loader: () => import('../../packages/zent/CHANGELOG.md') })",
+                "DocLoadable({ loader: () => import('../../packages/zent/RELEASE_v9.md') })",
+            },
+            {
+              title: '7.0.0 迁移指南',
+              path: 'guides/changelog-v7',
+              source:
+                "DocLoadable({ loader: () => import('../../packages/zent/RELEASE_v7.md') })",
             },
             {
               title: '3.x 升级指南',
@@ -79,6 +87,13 @@ module.exports = {
               hidden: true,
               source:
                 "DocLoadable({ loader: () => import('../../packages/zent/docs/migrating-2.1_zh-CN.md') })",
+            },
+            {
+              title: 'Github 日志',
+              path: 'guides/github_changelog',
+              hidden: true,
+              source:
+                "DocLoadable({ loader: () => import('../../packages/zent/CHANGELOG.md') })",
             },
           ],
         },
@@ -121,10 +136,10 @@ module.exports = {
                 "DocLoadable({ loader: () => import('../../packages/zent/README_en-US.md') })",
             },
             {
-              title: 'Demos',
-              path: 'guides/demos',
+              title: 'Babel Plugin',
+              path: 'guides/babel-plugin-zent',
               source:
-                "DocLoadable({ loader: () => import('../../packages/zent/docs/DEMO_en-US.md') })",
+                "DocLoadable({ loader: () => import('../../packages/babel-plugin-zent/README_en-US.md') })",
             },
             {
               title: 'Internationalization',
@@ -133,28 +148,31 @@ module.exports = {
                 "DocLoadable({ loader: () => import('../../packages/zent/docs/I18N_en-US.md') })",
             },
             {
-              title: 'babel-plugin-zent',
-              path: 'guides/babel-plugin-zent',
-              hidden: true,
-              source:
-                "DocLoadable({ loader: () => import('../../packages/babel-plugin-zent/README_en-US.md') })",
+              title: 'API Document',
+              link: 'apidoc',
             },
           ],
         },
         {
           groupName: 'Theme',
           list: [
-            {
-              title: 'Colors',
-              path: 'guides/colors',
-              source:
-                "DocLoadable({ loader: () => import('./pages/colors/en-US.js') })",
-            },
+            // {
+            //   title: 'Colors',
+            //   path: 'guides/colors',
+            //   source:
+            //     "DocLoadable({ loader: () => import('./pages/colors/en-US.js') })",
+            // },
             {
               title: 'Customize',
               path: 'guides/theme',
               source:
-                "DocLoadable({ loader: () => import('../../packages/zent/docs/THEME_en-US.md') })",
+                "DocLoadable({ loader: () => import('../../packages/zent/src/theme/README_en-US.md') })",
+            },
+            {
+              title: 'Coding Guides',
+              path: 'guides/writing-themable-code',
+              source:
+                "DocLoadable({ loader: () => import('../../packages/zent/docs/Theme-Coding_en-US.md') })",
             },
           ],
         },
@@ -168,11 +186,10 @@ module.exports = {
                 "DocLoadable({ loader: () => import('../../packages/zent/RELEASE_en-US.md') })",
             },
             {
-              title: 'Github Log',
-              path: 'guides/github_changelog',
-              hidden: true,
+              title: 'Upgrade to 7.0.0',
+              path: 'guides/changelog-v7',
               source:
-                "DocLoadable({ loader: () => import('../../packages/zent/CHANGELOG.md') })",
+                "DocLoadable({ loader: () => import('../../packages/zent/RELEASE_v7.md') })",
             },
             {
               title: 'Upgrade to 3.x',
@@ -187,6 +204,13 @@ module.exports = {
               hidden: true,
               source:
                 "DocLoadable({ loader: () => import('../../packages/zent/docs/migrating-2.1_en-US.md') })",
+            },
+            {
+              title: 'Github Log',
+              path: 'guides/github_changelog',
+              hidden: true,
+              source:
+                "DocLoadable({ loader: () => import('../../packages/zent/CHANGELOG.md') })",
             },
           ],
         },

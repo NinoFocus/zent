@@ -21,8 +21,9 @@ A floating card opened by clicking, hovering or focusing.
 |------|------|------|--------|--------|-------|
 | content | Pop content | `node` | Yes | | |
 | trigger | Trigger method | string | No | `'none'` | `'click'`, `'hover'`, `'focus'` |
-| position | Pop content position, naming rule: content position relative to trigger + arrow position relative to Pop | string | No | `'top-center'` |  |
+| position | Pop content position, naming rule: content position relative to trigger + arrow position relative to Pop. Can be a placement function, see `Popover.Position.create` | string \| func | No | `'top-center'` |  |
 | centerArrow | Always center arrow to trigger | bool | No | `false` |  |
+| cushion | Same as the `cushion` in Popover, which is usually the distance between the edge of the Pop and the trigger element | number | No | `10` |  |
 | header | Pop header | node | No | | |
 | block | Is trigger a block element | bool | No | `false` |  |
 | onShow | Callback after Pop has opened | func | No | `noop` | |
@@ -33,14 +34,14 @@ A floating card opened by clicking, hovering or focusing.
 | onCancel | Cancel callback | func | No | |  |
 | confirmText | Confirm button text | string | No | `'Confirm'` |  |
 | cancelText | Cancel button text | string | No | `'Cancel'` |  |
-| type | Confirm button type | string | No | `'primary'` | `'default'`, `'danger'`, `'success'` |
+| type | Confirm button type | string | No | `'primary'` | `'default'`                          |
 | visible | Pop switch to controlled mode if this prop is set, must be used with `onVisibleChange` | bool | No | | |
 | onVisibleChange | Must be used with `visible` | func | No | | |
 | onPositionUpdated | callback after position updates, a position update does not imply a position change | func | No | `noop` | |
 | onPositionReady | callback after content enter viewport, only called once within the life cycle | func | No | `noop` | |
-| className | Custom class name | string | No | `''` |  |
-| wrapperClassName | Custom trigger wrapper class name | string | No | `''` |  |
-| prefix | Custom class name prefix | string | No | `'zent'` |  |
+| containerSelector | pop's parent node CSS selector | string | No | `'body'` | all legal CSS selector | |
+| className | Custom content class name | string | No |  |  |
+| style | Custom content style | `CSSProperties` | No |  |  |
 
 `Pop` has some additional props depends on different triggers.
 
@@ -49,7 +50,6 @@ A floating card opened by clicking, hovering or focusing.
 | Property | Description | Type | Required |  Default |
 |------|------|------|--------|--------|
 | closeOnClickOutside | Close Pop when click outside trigger and content | bool | No | `true` |
-| isOutside | Callback to determine if click is outside of Pop | func | No | |
 
 #### Hover
 
@@ -57,8 +57,20 @@ A floating card opened by clicking, hovering or focusing.
 |------|------|------|--------|---------|
 | mouseEnterDelay | Hover open delay(in ms) | number | No | `200` |
 | mouseLeaveDelay | Hover close delay(in ms) | number | No | `200` |
-| isOutside | Callback to determine if mouse is outside of Pop | func | No | |
-| quirk | Switch to quirk mode, you don't have to move from inside to outside to trigger a close in quirk mode | bool | No | `true` |
+| anchorOnly | Only use trigger as hot area | boolean | No | `false` |
+| fixMouseEventsOnDisabledChildren | Fix mouse events on disabled children | boolean | No | `false` |
+
+**PS:**`fixMouseEventsOnDisabledChildren` is only effective on Zent components.
+
+Why
+
+- [Mouse events don't trigger on disabled button](https://github.com/youzan/zent/issues/142)
+
+Workaround
+
+- Wrap the disabled button/input in another element.
+- Then add {pointer-events: none} style to the disabled button/input.
+
 
 #### None
 
@@ -84,6 +96,10 @@ Use this function to manually adjust `Pop` position.
 Use this function to get the internal `Popover` instance.
 
 ### FAQ
+
+#### Wrong popup position with long text content
+
+It is likely you are passing a long string directly into `content` if this happens. Give `content` a width to make sure `Pop` can get the right width.
 
 #### centerArrow
 

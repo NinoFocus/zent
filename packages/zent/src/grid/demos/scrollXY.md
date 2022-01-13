@@ -1,5 +1,5 @@
 ---
-order: 9
+order: 10
 zh-CN:
 	title: 水平和垂直滚动
 	product: 商品
@@ -50,6 +50,7 @@ const datasets = [];
 
 for (let i = 0; i < 5; i++) {
 	datasets.push({
+		id: i,
 		name: `{i18n.product} ${i}`,
 		uv: 20,
 		stock: 5,

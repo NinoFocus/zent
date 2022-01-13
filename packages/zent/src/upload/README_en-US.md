@@ -6,29 +6,53 @@ group: Data Entry
 
 # Upload
 
-File uploader. Supports images and audios.
+File uploader.
 
 ### API
 
-| Property | Description | Type | Default | Required |
-|------|------|------|--------|--------|
-| type | Upload type, the default value is 'image', use 'voice' for audio | string | `'image'` | No |
-| localOnly | Allow local images only | boolean | `false` | No |
-| tips | Hint text | string | `''` | No |
-| maxSize | Image size limit in bytes | number | `1024 * 1024` | No |
-| maxAmount | Limit number of images, 0 means no limit | number | `0` | No |
-| accept | Allowed file types | string | `'image/gif, image/jpeg, image/png, image/bmp'` | No |
-| silent | Deprecated, No notification about sucesss/failure when set to true | boolean | `false` | No |
-| triggerInline | Make trigger node's display inline | boolean | `false` | No |
-| onFetch | Callback to fetch remote image | function | `noop` | No |
-| onUpload | Callback to upload local image | function | `noop` | No |
-| onProgress | Progress callback when uploading local image  | function | `noop` | No |
-| filterFiles | Filter local files, supports Promise as return value | function | `noop` | No |
-| categoryList | Group data | array | [] | No |
-| categoryId | Group id | number | [] | No |
-| auto | Open upload dialog automatically | boolean | `false` | No |
-| withoutPopup | Don't render inside a popup | boolean | `false` | No |
-| triggerClassName | Custom trigger class name | string | `'zent-upload-trigger'` | No |
-| errorMessages | Custom error message, contains overMaxSize, overMaxAmount, wrongMimeType | object | `{}` | No |
-| className | Extension class name | string | `''` | No |
-| prefix | Custom prefix | string | `'zent'` | No |
+#### Common Props
+
+| Property         | Description                                                                                                               | Type                                   | Default                | Required |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- | ---------------------- | -------- |
+| className        | Custom className                                                                                                          | string                                 |                        | No       |
+| beforeUpload     | The pre handler before file start upload, upload will be ignore when handler return false or a rejected Promise           | `(file: File) => boolean               | Promise<void>`         |          | No  |
+| manualUpload     | Is control upload manually, if value is true, you should change file list data by yourself when upload event update       | boolean                                | false                  | No       |
+| onUpload         | The file upload handler                                                                                                   | `IUploadOnUploadHandler`               |                        | No       |
+| onError          | The unified callback when some error happened, you can find detail in `IUploadErrorMessageConfigMap`                       | `IUploadOnErrorHandler`                | No                     |
+| maxSize          | The size limit of file, unit is byte，unlimited when value is `Infinity`                                                  | number                                 | `Infinity`             | No       |
+| accept           | Allowed file types, same with [input accept](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept) | string                                 |                        | No       |
+| disabled         | Is disable upload                                                                                                         | boolean                                |                        | No       |
+| tips             | The tips content or generator                                                                                             | `React.ReactNode` \| `IUploadTipsFunc` |                        | No       |
+| customUploadItem | Custom Upload display item                                                                                                | `React.ComponentType<IUploadFileItem   | IImageUploadFileItem>` |          | No  |
+
+#### SingleUpload
+
+| Property | Description                                                    | Type                     | Default | Required |
+| -------- | -------------------------------------------------------------- | ------------------------ | ------- | -------- |
+| value    | upload item                                                    | IUploadFileItem          |         | No       |
+| onChange | Callback when item changed, any behavior on item will emit it. | `IUploadOnChangeHandler` |         | Yes       |
+
+#### Multi Common Props
+
+| Property        | Description                                                                             | Type                                               | Default    | Required |
+| --------------- | --------------------------------------------------------------------------------------- | -------------------------------------------------- | ---------- | -------- |
+| fileList        | The file list in controlled mode                                                        | Array<`IUploadFileItem` \| `IImageUploadFileItem`> |            | No       |
+| defaultFileList | The default file list in uncontrolled mode                                              | Array<`IUploadFileItem` \| `IImageUploadFileItem`> |            | No       |
+| onChange        | Callback when file list changed, any behavior change file list or content will emit it. | `IUploadOnChangeHandler`                           |            | Yes      |
+| multiple        | Is support file multiple select                                                         | boolean                                            | false      | No       |
+| maxAmount       | The count limit of files, unlimited when value is `Infinity`                            | number                                             | `Infinity` | No       |
+| sortable        | Is allow sort file list                                                                 | boolean                                            | false      | No       |
+
+#### Upload
+
+| Property   | Description                           | Type    | Default | Required |
+| ---------- | ------------------------------------- | ------- | ------- | -------- |
+| pagination | Is paging file list                   | boolean | false   | No       |
+| pageSize   | The page size of pagination component | number  | 5       | No       |
+
+#### ImageUpload
+
+| Property            | Description                                                            | Type                         | Default                                | Required             |
+| ------------------- | ---------------------------------------------------------------------- | ---------------------------- | -------------------------------------- | -------------------- |
+| preview             | Custom preview handler when click image                                | `IImageUploadPreviewHandler` | PreviewImages( without failed images ) | No                   |
+| getThumbSrcFromFile | Custom function to transform file to thumbSrc attribute of upload item | `(file: File) => string      | Promise<string>`                       | FileReader implement | No  |

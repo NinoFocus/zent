@@ -28,9 +28,15 @@ node_modules
 
 dist/
 lib/
+es/
 npm-debug.log
 .tmp/
 .DS_Store
 custom-theme.js
+dependency-graph.json
+theme-css-vars.json
+plugins/ts-plugin-*.js
+*.tsbuildinfo
+src/invalidate-ts-cache.ts
 
 css/

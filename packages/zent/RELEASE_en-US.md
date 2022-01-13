@@ -4,8 +4,736 @@ You can find detailed change logs for versions prior to 3.5.3 at [Github Log](gi
 
 ### Upgrade guides
 
+- [Upgrade to 9.x](./changelog-v9)
+- [Upgrade to 7.x](./changelog-v7)
 - [Upgrade to 3.x](../migrating/3x)
 - [Upgrade to 2.1.x](../migrating/21x)
+
+### 9.12.4(2022-01-11)
+- `Popover`
+  - 🦀 Fix withPop HOC type error
+- `Grid`
+  - 🦀 Replace sort button with iconfont, fix position problem when font-family changed
+  - 🦀 `selectedRowKeys` support number type
+- 🦀 Fix css variable name matching problem, old color can be override and delete the useless prefix
+- 🦀 Update `caniuse-lite` database to latest version
+
+### 9.12.3(2021-12-08)
+- `DatePicker`
+	- 🦀️ Disable `DatePicker` confirm button when `TimePicker` is open
+
+### 9.12.2(2021-11-26)
+
+- 🦀️ Fix `MiniPagination` page number input renders wrong value in some cases
+
+### 9.12.1(2021-11-17)
+
+- `Form`
+	- 🦀️ Add `destroyOnUnmount` and `normalizeBeforeSubmit` support to `FieldSet` and `FieldArrayModel`
+	- 🦀️ Fix crash when `FieldSet` sets `destroyOnUnmount` and `value` or `valid` are never read
+- `CombinedDateRangePicker`
+	- 🦀️ Make `onChange` trigger only when confirm button is clicked
+	- 🦀️ Fix start time lost after selecting end time
+
+### 9.12.0(2021-10-26)
+
+- `Form`
+	- ✨ Add `filter` and `sort` methods to `FieldArrayModel`
+	- ✨ Add `useObservableBatchedEagerState` for merging model changes
+	- ✨ Replace `useValue$` with `observable-hooks`
+- `Notice`
+	- 🦀️ Fix `Notice.push` crash in some cases(e.g. `useEffect`)
+	- 🦀️ Changed `Notice.push`'s return type and `Notice.remove`'s parameter type from `number` to `string`
+- 🦀️ Update `caret-down` and `caret-up` icons
+- 🦀️ Update `SplitButton` arrow style
+- 🦀️ Fix incorrect end date in `RangeDatePicker` when `showTime` is `false`
+- 🦀️ Update `caniuse-lite` database to latest version
+
+### 9.11.0(2021-09-29)
+
+- ✨ Add `meta.simplify` to `onChange` callback in `MenuCascader` multiple mode
+- `I18n`
+	- ✨ Add `useComponentI18nData` hook
+	- 🦀️ Refine `I18nReceiver` typings
+- 🦀️ Fix `onMove`, `onEnd` and `onMove` callbacks triggered not up to date in `Sortable`
+- 🦀️ Change default error message for `Form` `Field` `required` prop to `'required'`
+- 🦀️ Fix `style` prop in `Input` being applied twice
+- `Grid`
+	- 🦀️ Fix state of the select all checkbox in header
+	- 🦀️ Fix row highlight behavior when there're fixed columns but `scroll.x` is falsy value
+- 🦀️ Upgrade `caniuse-lite` to latest
+- 📚 Add `onOpened` and `onClosed` to `Dialog` doc
+- 📚 Cleanup usage of `danger` and `success` `Button`s in doc
+
+### 9.10.1(2021-09-15)
+
+- 🦀️ Preserve `state` in `NumberInput` when a rerender occurs during editing with no `props` change
+
+### 9.10.0(2021-09-14)
+
+- ✨ Add `auto` mode to `topOffset` and `bottomOffset` in `Waypoint`
+- ✨ Auto focus to search input after selection in `Cascader` tags mode
+- 🦀️ Stop event propagation in nested `Form` events(`submit`, `reset` and `enter`)
+- 🦀️ Adjust default `threshold` to `1px` for `InfiniteScroller`
+- 🦀️ `Grid` will hide select all checkbox in batch operation area if `batchRender` returns `null`
+- 🦀️ Update arrow icon in `Select` and `Cascader`
+- 📚 Update `caniuse-lite` database
+- 📚 Fix typo in `Pagination` demo
+- 📚 Fix `validate` default value description in `Form` documentation
+- 📚 Fix typo in `ClampLines` source code
+
+### 9.9.3(2021-08-28)
+
+- 🦀️ Replace `ttypescript` with `ts-patch`
+- 🦀️ Fix `MiniPagination` not reacting to `props.current` change
+- 🦀️ Fix `lastPageHelp` not working in pagination components
+- 📚 Remove gitee mirror for docs
+- 📚 Add Github Action to check for 404 links in `Form` doc
+- 📚 Add docs on `NumberInput` `onInput`
+
+### 9.9.2(2021-08-16)
+
+- ✨ Add hotel icons
+- `Form`
+	- ✨ Add `controlStyle` support in `FormContext`
+	- ✨ Add `direction` support in form layout
+	- 🦀️ Fix `FieldArrayModel.splice` can not insert new items
+	- 🦀️ Rename `FieldUtils.makeChangeHandler` to `useChangeHandler` because it's a React hook
+	- 🦀️ Optimize `validator` runtime error message
+	- 📚 Fix broken API links caused by upgrading `typedoc` in previous version
+
+### 9.9.1(2021-07-30)
+
+- 🦀️ Fix `font-family` missing version tag in `Icon` style
+- 🦀️ Upgrade `caniuse-lite` database to latest
+
+### 9.9.0(2021-07-23)
+
+> Please upgrade `sass` to `>=1.33.0` if your `sass` complains about [`math.div` function](https://sass-lang.com/documentation/breaking-changes/slash-div) not found.
+
+- ✨ Semantic theme support and a new `@zent/theme-sdk` for generating theme config
+- ✨ New `jaJP` component translations
+- 🦀️ Prefix `Tree` CSS class names
+	- `switcher` => `zent-tree-switcher`
+	- `content` => `zent-tree-content`
+	- `opt` => `zent-tree-operation`
+	- `operation` => `zent-tree-operation-container`
+	- `off` => `zent-tree-bar--off`
+- 🦀️ `NumberInput`
+	- Fix incorrect`state.value` when `props.value` changes in uncontrolled mode
+	- Fix demo behavior in docs
+- 🦀️ `Form`
+	- Deprecate `Form.useFieldArrayValue` in favor of `Form.useFieldArrayChildModels`
+	- Fix demos missing `Form` docs
+- 🦀️ Ban `useLayoutEffect` because of annoying warnings in SSR mode, use `utils/hooks/useIsomorphicLayoutEffect` instead
+- 📚 Add a demo for using the return value of `openDialog` to close dialog in `Dialog` docs
+- Remove `postcss-plugin-constants` plugin in NPM package
+- Update `caniuse-lite` database to latest version
+- Replace `sass-lint` with `stylelint`
+
+### 9.8.0(2021-07-15)
+
+- ✨ Rework all icons with a few new icons
+- 🦀️ Fix UI not updated when `selection` changes in `Grid`
+- 🦀️ Fix `Select` popup width when changing from `display: none` at mount to visible
+- 🦀️ Rewrite and cleanup `eslint` rules
+- 📚 Migrate site layout backbone to `TypeScript`
+
+### 9.7.3(2021-07-02)
+
+- 🦀️ Expose `file` and `id` properties in `Upload` file object, `_file` and `_id` are still there
+- 🦀️ Fix `bootstrap` script
+- 📚 Replace `useMAppend` with `useMulti` in `Form` documentation
+- Update dependencies
+	- `TypeScript` `4.1` to `4.3`
+	- `rxjs` `v6` to `v7`
+	- `sortablejs` `1.12.0` to `1.13.0`
+	- `webpack` `v4` to `v5`, this improves dev mode compile performance
+	- `jest` `v24` to `v27`
+	- `postcss` `v6` to `v8`
+	- Upgrade all other dependencies to the latest versions
+- 📚 Replace `react-refresh-webpack-plugin` with `@hot-loader/react-dom`
+
+### 9.7.2(2021-06-25)
+
+- 🦀️ Fix `Tag` cannot be used as `Pop`'s trigger
+- 🦀️ Fix `Now` button disable logic in `DatePicker`
+- 🦀️ Update `caniuse-lite` database to latest version
+- 📚 Fix missing demos in `DataPicker` English documentation
+
+### 9.7.1(2021-06-17)
+
+- `Form`
+  - 🦀️ Add use-after-free check in models
+  - 🦀️ Fix performance warning text typo
+  - 📚 Add model API in documentation
+  - 📚 Update `destroyOnUnmount` description in documentation
+- 📚 Add long text FAQ in `Pop` documentation
+
+### 9.7.0(2021-06-04)
+
+- ✨ Allow `Field` and `FieldArray` hooks to be used without form context if using `Model` as argument. `FieldSet` hooks always require a form context.
+- ✨ Allow referencing models using names in `Model` mode, it was only possible in `View` mode.
+- ✨ Deprecate `useModelValue` and `useModelValid`, use `useFieldValue` and `useFieldValid` instead.
+- ✨ Add `builder` property to all model objects, only available in `Model` mode
+- ✨ Expose `removeChild` and `registerChild` in `FieldSetModel` and `FormModel`
+- ✨ Overload `push`, `unshift` and `splice` method in `FieldArrayModel` to allow using model objects as arguments
+- ✨ Add `useNamedChildModel` to subscribe child model remove/register actions
+- 📚 Update docs with a new demo showing how to add or remove child models in `Model` mode
+
+### 9.6.0(2021-05-28)
+
+- ✨ Add `threshold` to `InfiniteScroller` to control the distance before the end of the items that will trigger a call to `loadMore`
+- ✨ Support controlled mode for menu selection and expansion in `inline` `Menu`
+- ✨ Support inline `style` in `Checkbox`
+- 🦀️ Fix trigger and popup widths not in sync when `width` is not a number and `popupWidth` is not set in `Select`
+- 📚 Update `Collapse` typings and docs
+
+### 9.5.0(2021-05-07)
+
+- ✨ Support non `window` container in `Affix`
+- ✨ Add `ref` support to `InfiniteScroller`
+- `Form`
+  - ✨ Support customize scroll DOM node in `willScrollToError`
+  - 🦀️ Remove `null` in `ArrayBuilder` typings
+  - 🦀️ Internal code path no longer triggers subscription performance warnings
+- 🦀️ Fix incorrect handling of `Fragment` in `Popover` triggers
+- 🦀️ Fix incorrect handling of `Fragment` in `ButtonDirective`
+- 🦀️ Fix `onChange` not fired within `IMEComposition` in some browsers, e.g. Safari
+- `Grid`
+  - 🦀️ Update single/multiple/expand column styles
+  - 🦀️ Rename `nowrap` to `noWrap` in column config, `nowrap` still works
+  - 📚 Remove `Table` comparison in documentation
+- 📚 Update `Form` documentation
+
+### 9.4.2(2021-03-26)
+
+- 🦀️ Change `children` to optional in `Badge` TS definition
+- 🦀️ Upgrade `@wojtekmaj/enzyme-adapter-react-17` to latest version
+- `Upload`
+  - 🦀️ Fix `getUploadSuccessOverrideProps` not working
+  - 🦀️ Fix typos in code and doc
+- `Form`
+  - 🦀️ Add warning when setting default value in `props.props` in `FormInputField`, `FormImageUploadField` and `FormUploadField`
+  - 📚 Fix issues caused by using array index as `key` in `Model` strategy example
+  - 📚 Restructure documentation for better readbility
+- 📚 Fix crash in `Select` virtual scroll demo
+- Documentation
+  - 📚 Add sync to Gitee Pages step in Github Action
+  - 📚 Send Wechat Work notification after releasing a new version in Github Action
+  - 📚 Update logo and design site link
+
+### 9.4.1(2021-03-11)
+
+- ✨ Export `useFormChild` in `Form`
+- 🦀️ Fix incorrect selection state after `options` changes in `Cascader`
+- 📚 Use relative url for links to old versions of docs
+- 📚 Upgrade `prismjs` to fix security issues
+- 📚 Add `Dialog` UI changes to breaking changes in `v9` change log
+
+### 9.4.0(2021-02-26)
+
+- ✨ `Popover` / `Pop` / `Tooltip` hover mode handles disabled `input` and `button` correctly, but only with zent native inputs and buttons
+- `Select`
+  - ✨ Add `meta` `onKeywordChange` to distinguish event source
+  - 🦀️ Suppress `onChange` events during IME composition
+
+### 9.3.0(2021-01-28)
+
+- ✨ `MenuCascader` supports selection merge with `simplifySelection`
+- `Form`
+  - ✨ Add`clearError` to form models
+  - ✨ Add two new hooks `useModelValue` and `useModelValid` which don't rely on `FormContext`
+- 📚 Add missing description of `Table` in v9 changelog
+
+### 9.2.0(2021-01-21)
+
+- ✨ `Grid` now supports single selection
+- `DatePicker`
+  - 🦀️ Fix year and month selection disable logic
+  - 🦀️ Update UI interaction in `CombinedDatePicker`
+  - 🦀️ `disabled` and `canClear` in `DateRangePicker` can be an array
+- 🦀️ Fix `min` and `max` not working in `DateRangeQuickPicker`
+- 🦀️ Fix typings in `Select`, `Switch` and `CheckboxGroup`
+- 🦀️ Fix React warning in `Form` with `willScrollToError`
+- 🦀️ Update arrow style in `Select` and `Cascader`
+
+### 9.1.2(2021-01-11)
+
+- 🦀️ Fix incorrect checkbox state in `Grid`
+- 🦀️ Fix `expandAll` not reacting to props change in `Tree`
+- 🦀️ Fix `FormInputField` demo in `Form` doc
+
+### 9.1.1(2021-01-05)
+
+- ✨ Add a new icon
+- `Form`
+  - ✨ Supports custom offsets through `willScrollToError` when scrolling to first error
+  - 🦀️ Changed vertical margin between fields to 24px
+
+### 9.1.0(2020-12-21)
+
+- 💥 Fix generic types in `Select`, from one type parameter to two type parameters, `Select<ISelecItem<number>>` => `Select<number>`
+- ✨ New simple file upload component
+- ✨ Supports custom step in `NumberInput`
+- 🦀️ Fix border style issue in disabled `Button`
+
+### 9.0.2(2020-12-18)
+
+- ✨ `Swiper` supports custom previous/next button
+
+### 9.0.1(2020-12-18)
+
+- `Select`
+  - ✨ Add value reviver support to Select
+  - ✨ Support custom tag list render in multiple mode
+- `Grid`
+  - ✨ `batchRender` adds position information
+  - 🦀️ Fix incorrect height with float grouped header
+- 🦀️ `DateRangeQuickPicker` formats the endtime of today to current time
+
+### 9.0.0(2020-12-14)
+
+See [Upgrade to 9.x](./changelog-v9).
+
+### 8.6.3(2021-03-19)
+
+- 🦀️ Fix `onUpload` return value being ignored in `Upload`
+
+### 8.6.2(2021-01-11)
+
+- 🦀️ Fix `expandAll` not reacting to prop change in `Tree`
+
+### 8.6.1(2020-12-18)
+
+- `Grid`
+  - 🦀️ Fix the fixed cloumns' height when head groups
+  - 🦀️ `batchRender` supports second optional parameter about position
+
+### 8.6.0(2020-12-15)
+
+- ✨ Supports `rgba` in theme colors
+- 🦀️ Adjust `Radio` right margin to `24px`
+
+### 8.5.12(2020-11-05)
+
+- 🦀️ Fix wrong file order when uploading in `Upload`
+- 🦀️ Fix custom row component prop type in `Grid`
+
+### 8.5.11(2020-10-28)
+
+- 🦀️ Fix type definitions in `Form`
+- 🦀️ Fix `WindowEventHandler` compatibilty issue with SSR
+- 🦀️ Hide clear button when `Input` is not editable
+
+### 8.5.10(2020-10-22)
+
+- Fix a bug that prevents moving an item to the front in `Sortable`
+
+### 8.5.9(2020-10-12)
+
+- `Form`
+  - 🦀️ Fix cannot assign value to `FormModel.prototype.owner`
+  - 🦀️ Optimize async subscribe logic in `value-listener`
+  - 🦀️ Optimize TypeScript definitions
+- 🦀️ Fix incorrect handleing of `disabled` in `Button`
+- 🦀️ Fix runtime error in `Portal` when used in SSR mode
+- 🦀️ Fix `ClampLines` render issues when text is empty
+
+### 8.5.8(2020-09-11)
+
+- 🦀️ Adjust space between succesive `Button`s
+- `Form`
+  - ✨ Add `form.resetValue` to reset all fields to `initialValue`
+  - 🦀️ Fix unnessary creation of `ZentForm`
+- `Input`
+  - ✨ Add a new `onIconClick` callback
+  - ✨ `TextareaInput` add `maxCharacterCount` prop to support textarea's value out of range
+
+### 8.5.7(2020-08-28)
+
+- 🦀️ Fix `Progress` of `circle`'s `normalColor`, `successColor`, `exceptionColor` and `strokeWidth` not working
+
+### 8.5.6(2020-08-21)
+
+- 🦀️ Fix `Slider` value out of range
+- 🦀️ Adjust space between succesive `Checkbox`s
+- `Form`
+  - 🦀️ Export `IMaybeError` and `ValidatorContext`
+  - 🦀️ Fix `FormSelectField` type definition
+
+### 8.5.5(2020-08-14)
+
+- ✨ `Loading` has a new prop `colorPreset`
+- ✨ `ColorPicker` now supports `disabled`, and is compatible with `Disabled` component
+- 🦀️ Fix `Table`'s `renderBody` TypeScript definition
+- 🦀️ Fix `Form`'s `scrollToError` scrolls to wrong position
+- 🦀️ Remove unused dependency `formulr`
+- 🦀️ Updated two icons: `calendar-o` and `gift`
+- 📚 Update `prismjs` to `1.21.0` for documentation code highlight
+
+### 8.5.4(2020-08-04)
+
+- 🦀️ Fix unmatched `TypeScript` and `tslib` version in `8.5.3`
+- 🦀️ Fix label text color in disabled `Checkbox`
+- 📚 Add a new demo for custom `Form` field
+
+### 8.5.3(2020-07-22)
+
+- ✨ Add a new icon `thumbnail`
+- `Form`
+  - ✨ Merge `formulr` into `Zent` repository
+  - ✨ Add `FormContext`, only supports `labelStyle` for now
+  - 🦀️ Ensure `FieldArray`'s child has an `id`, no need to use array indices for `key`
+  - 🦀️ Fix a React warning
+- 🦀️ Fix an issue in `Grid` when `batchComponents` is an empty array
+- 🦀️ Fix style lint when building custom theme
+- 🦀️ Allow word wrap in `ClampLines`
+- 📚 Add `babel-plugin-zent` link in doc site side nav
+- 📚 Fix some style issue in doc site
+
+### 8.5.2(2020-06-23)
+
+- `Form`
+  - 🦀️ Fix some minor issues
+  - 🦀️ `FormSelectField` is compatible with `tags` mode
+  - 🦀️ Export validator types
+- 🦀️ Fix `Swiper` transition issue in some edge cases
+- 🦀️ Fix `ScrollAlert` children check
+
+### 8.5.1(2020-06-10)
+
+- ✨ `Tooltip` now passes `display` prop to `Popover`
+- ✨ New icon: `drag`
+- 🦀️ Update `Dialog` TypeScript definition
+- 🦀️ Fix `NumberInput` TypeScript definition
+- 🦀️ Fix `Form` warning in React >= 16.13
+- 📚 More docs on `Form` `ValidateOption`
+
+### 8.5.0(2020-05-07)
+
+- ✨ Add 4 new icons: `folder-o`, `open-folder-o`, `refresh`, `save-o`
+- ✨ Remove `Upload` default help text, don't render help text if `tips` is not present
+- `Alert`
+  - ✨ Add `hint` style
+  - ✨ Add `ScrollAlert` for rolling alert
+- `Form`
+  - ✨ `Field`'s `validate` now propagates to `FieldArray` or `FieldSet`
+  - ✨ Add `ValidatorMiddlewares`, these middlewares can be used to dynamically change validators behavior
+  - ✨ `FormSelectField` pass through `children`
+  - 🦀️ Fix `Form` `submit` use after unmount
+  - 🦀️ Fix `Select`、`Option`、`FormInputField` type definition
+- 🦀️ Fix `Grid` shadow after `scroll.x` changes
+- 🦀️ Fix `Collapse` type definition
+- 🦀️ Fix `Pagination` page jump not working in some cases
+
+### 8.4.0-1(2020-11-17)
+
+- 🦀️ Fix CSS Variable support in some components
+
+### 8.4.0(2020-03-16)
+
+- ✨ `Upload` item UI can be customized
+- ✨ Update `Tabs` button like style
+- 🦀️ Fix development compatibility issue on `Windows`
+- 🦀️ Fix an issue where `DatePicker` modifies `Date` values in props directly
+- `Grid`
+  - 🦀️ Fix shadow of fixed column when window resizes
+  - 🦀️ Fix background color when row hover highlight is disabled
+  - 🦀️ Fix TypeScript definition of `getCheckboxProps`
+- `Form`
+  - 🦀️ Export `BasicForm`
+  - 🦀️ Fix mishandling of type conversion for `required`
+
+### 8.3.0(2020-02-26)
+
+- `Grid`
+  - ✨ Add `disableHoverHighlight` to disable row hover highlight
+  - 🦀️ Fix wrong selection data after reverting [Select All]
+- 🦀️ Fix some broken style in documentation
+- `Form`
+  - 🦀️ Update styles
+  - 🦀️ Fix `FieldSet` type definition
+  - 🦀️ Export `ValidateOption`
+- 📚 Upgrade documentation site dependencies
+
+### 8.2.0(2020-02-18)
+
+- ✨ `BlockHeader` has a new minimum style
+- ✨ `Grid` stick header offset top can be customized
+- 🦀️ Fix style issue when value is outside range in `Progress`
+- `Form`
+  - 🦀️ Fix error style
+  - 🦀️ Fix TypeScript definition
+
+### 8.1.0(2020-02-10)
+
+- `Grid`
+  - ✨ Support sticky header
+  - ✨ Row checkbox can have a tooltip for the reason
+- `Form`
+  - ✨ Add field interaction demo
+  - ✨ Allow `validators` in `Field` when `model` is used
+  - 🦀️ Fix a `FormNumberInputField` bug that causes data and view in an inconsistent state
+  - 🦀️ Updated line height for non input fields
+- 🦀️ Improved dragging performance in `ColorPicker`
+- 🦀️ Fix item not selected when `Select` mounts
+- `Upload`
+  - 🦀️ Include failed files when calculating file numbers
+  - 🦀️ Export `FILE_UPLOAD_STATUS` as static property on component
+
+### 8.0.1(2020-01-19)
+
+- `Upload`
+  - 🦀️ Use a different CSS class name from the old version
+  - 🦀️ Fix a pagination bug when removing items
+
+### 8.0.0(2020-01-17)
+
+- 🎉 New component `Waypoint`
+- 🎉 New component `Dropdown`
+- 🎉 [breaking change] Rewrite `Upload`, use `@zent/compat` if you want the old version
+- `Cascader`
+  - ✨ Add support to `disabled`
+  - ✨ Remove `prefix`
+  - 🦀️ `onChange` is passed the same option item from props
+  - 🦀️ Update placeholder text color
+  - 🦀️ [breaking change] Namespace all CSS selectors
+- `Select`
+  - ✨ Remove `prefix`
+  - 🦀️ Update caret style
+  - 🦀️ [breaking change] Namespace all CSS selectors
+- `Affix`
+  - ✨ Rewrite using `Waypoint`
+  - ✨ [breaking change] `offsetTop` has no default value
+  - ✨ `offsetTop` and `offsetBottom` can be used together
+- `InfiniteScroller`
+  - ✨ Rewrite using `Waypoint`
+  - ✨ [breaking change] Remove `offset`, `useCapture` and `prefix`
+  - ✨ [breaking change] Rename `initialLoad` to `skipLoadOnMount`
+  - ✨ [breaking change] `hasMore` defaults to `false`
+  - ✨ [breaking change] `useWindow` defaults to `false`
+- ✨ Optimize event handlers in every place
+- `Icon`
+  - ✨ New icons `filter-o` and `scan-code-o`
+  - ✨ Rename `text-guide` to `text-guide-o`
+  - ✨ Rename `video-guide` to `video-guide-o`
+- ✨ `QuickDateRangePicker` can select a default preset on mount
+- ✨ Replace `tslint` with `eslint`
+- 🦀️ Update `Dialog` close button style
+- `Form`
+  - ✨ Add `useFieldValue` hook
+  - ✨ `Form` gets a `getSubmitValue` method
+  - 🦀️ Update error style
+  - 🦀️ Update TypeScript definition
+  - 🦀️ Export `FormDescription` component
+  - 🦀️ `FormSelectField` properly handles `withoutLabel`
+  - 🦀️ `layout` is optional
+- 🦀️ Fix `CopyButton` TypeScript definition
+- 🦀️ Update `Pagination` font style
+- 🦀️ Fix `Rate` icon issue when using fraction values
+- 🦀️ Fix incorrect rewrite rules used in `babel-plugin-zent`
+
+### 7.4.5(2021-03-11)
+
+- 🦀️ Back port [PR#1406](https://github.com/youzan/zent/pull/1406)
+
+### 7.4.4(2020-05-11)
+
+- 🦀️ Fix a state bug in `NumberInput`
+
+### 7.4.3(2019-12-19)
+
+- 🦀️ Fix `FormSelectField`'s `destroyOnUnmount` not working
+- 🦀️ Update `Form` TypeScript definition
+- 🦀️ All props are under `props` in `FormNumberInputField`(`integer`) and `FormSelectField`(`tags`, `data`)
+- 🦀️ Update form error style
+
+### 7.4.2(2019-12-13)
+
+- 🦀️ Fix a style issue in `Grid`
+- 🦀️ Fix TypeScript definition in `DateRangeQuickPicker`
+
+### 7.4.1(2019-12-13)
+
+- ✨ New icons：`doc`, `video`, `audio`
+- ✨ Replace `tinycolor2` with an internal slim version
+- 🦀️ Fix SSR for `Layout`
+- 🦀️ Add back support for `a.b.c` for column name in `Grid`, only for compatibility, not recommended for daily use
+- 🦀️ Fix repeated initialization in `Sortable` and TypeScript definition bugs
+- 🦀️ Fix `TextMark` TypeScript definition
+- 🦀️ Enlarge icon size in time pickers
+- 🦀️ Change `title` to `ReactNode` in `BlockHeader`
+- 🦀️ Cleanup unused `createAlias` usage
+
+### 7.4.0(2019-12-06)
+
+- ✨ New `Tooltip` component
+- ✨ Replace `lodash-es` with built-ins and language features
+- 🦀️ **[breaking change]** All time related pickers' `isFooterVisble` prop is renamed to `isFooterVisible`.
+- 🦀️ Fix Enter to select not working after filter in `Select`
+- 🦀️ Fix `Upload` crash if you remove some item during upload
+- 🦀️ Don't reassign unique internal id after DnD sort in `Upload`
+
+### 7.3.2(2019-11-29)
+
+- ✨ `Link` moves to its own directory, compatible with `Disabled`
+
+### 7.3.1(2019-11-27)
+
+- ✨ New `Link` component to replace `zent-link` CSS class
+- ✨ Add `labelStyle` to `Radio` and `Checkbox`
+- 🦀️ Fix `ButtonDirective` children style issue
+- 🦀️ Fix inconsistent package version between build and publish
+- 🦀️ Revert `Radio` label's `display` to `inline`
+- 🦀️ Fix elements other than `Radio` are invisible inside `RadioGroup`
+- 🦀️ Fix elements other than `Checkbox` are invisible inside `CheckboxGroup`
+
+### 7.3.0(2019-11-25)
+
+- 🎉 Isolate styles in different zent versions
+- 🎉 Add a few compile time constants to TypeScript and SCSS compiler, like `__FILE__` in C
+- 🦀️ Update icon color in `BlockHeader`
+- 🦀️ Fix style issue in `Grid` when batch operation and fixed header are both present
+- 🦀️ Fix `FormRadioGroupField` `defaultValue` test issue
+
+### 7.2.0(2019-11-18)
+
+- 🎉 New `IMEComposition` component
+- ✨ Add batch operation to `Grid`
+- ✨ Add tooltip when hover on next page in `Pagination`
+- ✨ Upgrade `date-fns` to 2.x
+- ✨ Fork `fecha` and rewrite in TypeScript
+- 📚 Add more docs on `Form` usage
+- 🦀️ Enlarge icon size in `BlockHeader`
+- 🦀️ Fix height issue in `Radio` and `Checkbox`
+- 🦀️ Fix data missing when using `useFieldArrayValue`
+- 🦀️ Fix the handling of `undefined` values in default error render of `Form` fields
+- 🦀️ Fix type definitions in `FormSelectField`, `Form` and `FieldSet`
+- 🦀️ Fix type definitions in `Switch`, `CopyButton` and `DatePicker`
+
+### 7.1.0(2019-11-08)
+
+- ✨ `Select` adds an `retainNullOption` option to allow Options with `null` value to be selected
+- ✨ New `Notify.info` method
+- 📚 Brand new icon grid
+- 🦀️ Fix `Progress` style when page is zoomed in/out in Safari
+- 🦀️ Fix type definition for `Form` and `Cascader`
+- 🦀️ Update `i18n` usage in `Pagination` and `QuarterPicker`
+
+### 7.0.1 (2019-11-01)
+
+- Add `default export` to `Form`
+
+### 7.0.0 (2019-11-01)
+
+This is major release with lots of breaking changes, read the [full change log](./changelog-v7).
+
+### 6.6.2 (2019-02-26)
+
+- `Form`
+  - 🦀️ Fix field error even if async validation is passed
+  - 🦀️ Update `createForm` TypeScript definition
+- 🦀️ Handle DOM not exist exception for `Affix` and `Avatar`
+
+### 6.6.1 (2019-01-30)
+
+- 🦀️ Fix bug in `Grid` header scroll
+
+### 6.6.0 (2019-01-29)
+
+- ✨ `Grid` supports head groups
+- 🦀️ Fix `undefined` error in `Table`, `Grid` and `WindowResizeHandler`
+
+### 6.5.3 (2019-01-13)
+
+- ✨ `Pop` `position` now supports function value, same as `Popover.Position.create`
+- `Form`
+  - 📚 Add docs about custom validation function
+  - 🦀️ Fix form scroll when using `Fragment`
+- 🦀️ Fix `ClampLines` not updating when changing `text`
+- 🦀️ Fix use after unmount bug in some components, e.g. `Table`, `Select`, `Grid` and `ClampLines`
+
+### 6.5.2 (2018-12-12)
+
+- ⚠️ Reverts an regression introduced in `6.4.0`. When using `FormSelectField` in `tags` mode, the value in `onChange` callback is broken. `Select` itself is not affected.
+
+### 6.5.1 (2018-12-07)
+
+⚠️ `6.5.2` reverted a regression for `FormSelectField` in `tags` mode.
+
+- ✨ Add a new icon
+- `Table`
+  - ✨ Support indeterminate state for row selection checkbox
+  - 🦀️ Fix right align not working
+- 🦀️ Fix `Form` component validation in propTypes definition
+- 🦀️ Fix some TypeScript definition bugs
+
+### 6.5.0 (2018-10-29)
+
+⚠️ `6.5.2` reverted a regression for `FormSelectField` in `tags` mode.
+
+⚠️ `Form`'s change may reveal bugs in working code, you can handle these unhandled exceptions in `onSubmitFail`.
+
+- ✨ Add a few new icons
+- 🦀️ `Form` will re-throw unhandled exceptions during submit
+- 🦀️ Replace `Object.assign` with `lodash/assign`
+- 🦀️ Fix incorrect z-index in `SKU`
+- 🦀️ Fix `Grid`'s `TypeScript` definition
+
+### 6.4.1 (2018-10-16)
+
+⚠️ `6.5.2` reverted a regression for `FormSelectField` in `tags` mode.
+
+- ✨ `Tabs` can have custom content through `navExtraContent`
+
+### 6.4.0 (2018-09-26)
+
+⚠️ `6.5.2` reverted a regression for `FormSelectField` in `tags` mode.
+
+- ✨ Support `tags` mode in `FormSelectField` (_reverted_)
+- 🦀️ Fix `Select` placeholder color
+- 🦀️ Fix `Upload` broken style when uploading multiple audio files
+
+### 6.3.0 (2018-09-07)
+
+- ✨ `TimePicker` add `disabledTime` support
+- ✨ `Loading` supports show delay
+- ✨ Add ES module output
+- ✨ `babel-plugin-zent@1.2.1` now has an option to only transform styles imports, use with ES module to support tree shaking(requires bundle tool support)
+- `InfiniteScroller`
+  - 🦀️ Fix `loadMore` repeatedly get called
+  - 🦀️ Fix documentation
+
+### 6.2.0 (2018-08-24)
+
+- 🎉 Add `ClampLines` component
+- ✨ `Grid` suppports DnD
+- ✨ `Menu` add sub menu click and expand/collapse callback
+- 🦀️ Disable input auto complete in `DatePicker`
+- 🦀️ Fix bug when initializing `FieldArray`
+
+### 6.1.0 (2018-08-03)
+
+- `Grid`
+  - ✨ Support a default text for each column
+  - 🦀️ Fix `selection.getCheckboxProps` not updated
+- ✨ Add some new `Icon`s
+- ✨ `Cascader` menu trigger can be controlled by `expandTrigger`
+- ✨ Add `containerSelector` support for `Pop`
+- `Button`
+  - ✨ Style update
+  - ✨ Add a space between button text iff button text consists of two Chinese characters
+- 🦀️ Fix a floating point number parsing issue in `NumberInput`
+- 🦀️ Rows in `Table` now can be configured as selected and disabled
+- 🦀️ Fix `FieldArray` not updating in `Form`
+- 🦀️ Fix lots of `TypeScript` definition issues
+
+### 6.0.1 (2018-07-13)
+
+> ⚠️ `Icon`'s ttf file may be broken on Windows in previous versions, use this version if Windows means a lot to you.
+
+- 🦀️ Fix broken `Icon`s in Windows
 
 ### 6.0.0 (2018-07-04)
 
@@ -29,7 +757,7 @@ You can find detailed change logs for versions prior to 3.5.3 at [Github Log](gi
   - ✨ Add missing `TypeScript` definition
   - ✨ Add support for row expansion using the same `expandation` prop as `Table`
   - ✨ Add a new `onExpand` callback when a row is expanded
-  - ✨ Support page size in `onChange` 
+  - ✨ Support page size in `onChange`
   - 🦀️ Remove `cloneDeep` usage，cloning a react element in React 16 results an error
   - 🦀️ Fix `rowKey` not working
   - 📚 Update documentation
@@ -107,7 +835,7 @@ If you rely on `zent-select` when overwriting `Select` popover style, use `zent-
 - ✨ Upgrade DnD library in `Design`
 - ✨ Add open/close animation to `Dialog`
 - `YearPicker`
-  - ✨ Add  `max` and `min` support
+  - ✨ Add `max` and `min` support
   - ✨ `value` supports `Date` type
 - 🦀️ Fix `Loading` `height` ignored in some cases
 - 🦀️ Fix `BlockHeader` style
@@ -145,6 +873,8 @@ If you rely on `zent-select` when overwriting `Select` popover style, use `zent-
 
 ### 4.3.2 (2018-03-07)
 
+> ⚠️ `Loading` style is broken in this version, do NOT use.
+
 - 🦀️ Update `Loading` height logic
 - 🦀️ Fix text in `Pagination`
 - 🦀️ Fix bugs when using nested `Radio` and `Checkbox`
@@ -152,8 +882,6 @@ If you rely on `zent-select` when overwriting `Select` popover style, use `zent-
 - 🦀️ Fix `Upload` style issues
 
 ### 4.3.1 (2018-03-05)
-
-> ⚠️ `Loading` style is broken in this version, do NOT use.
 
 - 🦀️ Fix wrong placeholder indentation when using tag style in `Select`
 - 🦀️ Fix calling `adjustPosition` in `Popover` in some cases
@@ -226,10 +954,10 @@ If you rely on `zent-select` when overwriting `Select` popover style, use `zent-
 ### 4.0.0 (2018-01-23)
 
 - 💥 Remove combine mode in `DateRangePicker`, `type` prop is removed.
-- `Upload` 
+- `Upload`
   - ✨ Supports file groups
   - ✨ Supports i18n
-- ✨ Add support for icons in `Menu` 
+- ✨ Add support for icons in `Menu`
 - `DatePicker`
   - 🦀️ Fix minimum time not respected in some cases
   - 🦀️ Fix minimum time test bug
@@ -282,11 +1010,11 @@ If you rely on `zent-select` when overwriting `Select` popover style, use `zent-
 - ✨ `Sweetalert` can configure close button and click on mask to close
 - 🦀️ Fix `DateRangePicker` disabled style
 - 🦀️ Fix `Loading` not centered
-- 🦀️ Fix `DatePicker` wrong value in `onChange` 
+- 🦀️ Fix `DatePicker` wrong value in `onChange`
 - 🦀️ Fix `NumberInput` inconsistent `onBlur` and `onChange` values
 - 🦀️ Fix `Upload` image order after uploading
 - 🦀️ Fix `Select` item order in tag mode
-- 🦀️ Fix can not edit hex in  `ColorPicker` 
+- 🦀️ Fix can not edit hex in `ColorPicker`
 - 🦀️ Fix `textarea` height tingle
 - 🦀️ Fix some typo
 - 🦀️ Fix `yarn new-component` command
@@ -388,13 +1116,13 @@ import HTML5Backend from 'react-dnd-html5-backend';
 import { DragDropContextProvider } from 'react-dnd';
 
 export default class YourApp {
-  render() {
-    return (
-      <DragDropContextProvider backend={HTML5Backend}>
-      /* ... */
-      </DragDropContextProvider>
-    );
-  };
+	render() {
+		return (
+			<DragDropContextProvider backend={HTML5Backend}>
+				/* ... */
+			</DragDropContextProvider>
+		);
+	}
 }
 ```
 
@@ -428,14 +1156,14 @@ export default class YourApp {
   - 🦀️ Fix styles in `disabled` state
 - 🦀️ Fix cannot upload the same image twice in `Upload`
 - 🦀️ Fix exceptions when `data` in `undefined` or `null` in `Select`
-- 🦀️ Fix disable logic in  `MonthPicker`
+- 🦀️ Fix disable logic in `MonthPicker`
 - 🦀️ Fix `emptyLabel` type in `Table`
 - 🦀️ Fix TypeScript definition for `Button`
 
 ### 3.9.5 (2017-11-13)
 
 - ✨ You can search components in doc site now.
-- 🦀️ Fix disable logic in  `DatePicker`
+- 🦀️ Fix disable logic in `DatePicker`
 
 ### 3.9.4 (2017-11-09)
 

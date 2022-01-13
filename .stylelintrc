@@ -1,7 +1,23 @@
 {
-  "extends": "stylelint-config-standard",
+  "extends": [
+    "stylelint-config-recommended-scss",
+    "stylelint-config-prettier"
+  ],
   "rules": {
-    "selector-pseudo-element-colon-notation": null
-  },
-  "ignoreFiles": ["node_modules", "**/*.js", "packages/zent/css"]
+    "no-descending-specificity": null,
+    "no-duplicate-selectors": null,
+    "declaration-no-important": true,
+    "keyframe-declaration-no-important": true,
+    "color-no-hex": true,
+    "color-named": "never",
+    "length-zero-no-unit": true,
+    "declaration-block-no-duplicate-properties": [
+      true,
+      {
+        "ignore": [
+          "consecutive-duplicates"
+        ]
+      }
+    ]
+  }
 }

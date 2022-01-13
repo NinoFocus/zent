@@ -21,22 +21,23 @@ group: 反馈
 
 | 参数           | 说明                            | 类型     | 默认值      |
 | ------------ | ----------------------------- | ------ | -------- |
-| title        | 自定义弹框标题                       | node   | `''`     |
-| children     | 弹框内容: `<Dialog>xxxx</Dialog>` | node   | `null`   |
-| footer       | 底部内容                          | node   | `null`   |
-| visible      | 是否打开对话框                       | bool   | `false`  |
-| closeBtn     | 是否显示右上角关闭按钮                   | bool   | `true`   |
-| onClose      | 关闭操作回调函数                      | func   | `noop`   |
-| mask         | 是否显示遮罩                        | bool   | `true`   |
-| maskClosable | 点击遮罩是否可以关闭                    | bool   | `true`   |
-| className    | 自定义额外类名                       | string | `''`     |
-| prefix       | 自定义前缀                         | string | `'zent'` |
-| style        | 自定义样式                         | object | `{}`     |
+| title        | 自定义弹框标题                       | `ReactNode`   | `''`     |
+| children     | 弹框内容: `<Dialog>xxxx</Dialog>` | `ReactNode`   | `null`   |
+| footer       | 底部内容                          | `ReactNode`   | `null`   |
+| visible      | 是否打开对话框                       | `boolean`   | `false`  |
+| closeBtn     | 是否显示右上角关闭按钮                   | `boolean`   | `true`   |
+| onClose      | 关闭操作回调函数                      | `(event) => void`   | `noop`   |
+| onOpened     | 对话框打开动画结束后的回调函数        | `() => void` |  |
+| onClosed     | 对话框关闭动画结束后的回调函数        | `() => void` |  |
+| mask         | 是否显示遮罩                        | `boolean`   | `true`   |
+| maskClosable | 点击遮罩是否可以关闭                    | `boolean`   | `true`   |
+| className    | 自定义额外类名                       | `string` | `''`     |
+| style        | 自定义样式                         | `CSSProperties` | `{}`     |
 
 
 #### openDialog
 
-`openDialog(options: object): function`
+`openDialog(options: Partial<IOpenDialogOption>): () => void`
 
 **`options` 参数支持组件除 `visible` 以外的所有属性，外加以下参数：**
 
@@ -47,8 +48,7 @@ group: 反馈
 
 如果需要组件实例的引用, 可以传一个函数形式的 `ref` 给 `openDialog`, **不支持字符串形式的 `ref`.**
 
-> `openDialog` 的返回值是一个手动关闭 Dialog 的函数, `close(false)` 将不会触发Dialog的 `onClose` 方法。**推荐使用 `closeDialog` 来关闭对话框。**
-
+> `openDialog` 的返回值是一个手动关闭 Dialog 的函数, `close(false)` 将不会触发Dialog的 `onClose` 方法。
 
 #### closeDialog
 

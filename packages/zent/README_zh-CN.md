@@ -16,15 +16,40 @@ Zent ( \ˈzent\ ) 是有赞 PC 端 WebUI 规范的 React 实现，提供了一�
 * 内置 TypeScript 类型定义文件
 * 支持定制主题
 * 代码/样式按需加载
-* yarn + webpack + babel + postcss + prettier + stylefmt
 * 一套有赞设计师绘制的图标库
-* 单测覆盖率在 90% 以上
 
 ### 支持环境
 
-* React >= 15.6
-* 现代浏览器以及 IE 11 及以上
+* React >= 17
 * 支持服务端渲染(SSR)
+
+### 浏览器
+
+#### 支持的浏览器
+
+* Firefox >= 78(ESR)
+* Chrome >= 49
+* Safari >= 10
+* Edge
+* 不支持 IE
+
+#### 需要的polyfill
+
+对于受支持的浏览器需要的 polyfill
+
+- `es6.object.assign`
+- `es6.object.is`
+- `es6.string.ends-with`
+- `es6.string.starts-with`
+- `es6.string.includes`
+- `es7.string.trim-left`
+- `es7.string.trim-right`
+- `es6.array.from`
+- `es6.array.of`
+- `es6.array.fill`
+- `es6.array.find`
+- `es6.array.find-index`
+- `es7.array.includes`
 
 ### 安装
 
@@ -52,10 +77,16 @@ import { Button } from 'zent';
 
 // 变换为
 
-import Button from 'zent/lib/button';
+import Button from 'zent/es/button';
 ```
 
 适用于基于 Zent 开发的组件库，以及对 Zent 使用量较少的项目。详细使用帮助请看[插件的文档](babel-plugin-zent)。
+
+除此之外，Zent 也支持 ESM 的 tree-shaking 方式配合打包工具来实现按需加载。
+
+### 主题
+
+请参考[定制主题](theme)
 
 <style>
 img[alt="zent-components"] {

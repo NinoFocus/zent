@@ -5,18 +5,17 @@ zh-CN:
 	apple: 苹果
 	pear: 梨子
 	orange: 橘子
-	rottenOrange: 烂橘子
+	rottenOrange: 烂苹果
 en-US:
 	title: Checkbox group
 	apple: Apple
 	pear: Pear
 	orange: Orange
-	rottenOrange: Rotten Orange
+	rottenOrange: Rotten Apple
 ---
 
 ```jsx
 import { Checkbox } from 'zent';
-const CheckboxGroup = Checkbox.Group;
 
 class App extends React.Component {
 
@@ -33,12 +32,12 @@ class App extends React.Component {
 
 		return (
 			<div>
-				<CheckboxGroup value={checkedList} onChange={this.onChange}>
+				<Checkbox.Group value={checkedList} onChange={this.onChange}>
 					<Checkbox value="Apple">{i18n.apple}</Checkbox>
 					<Checkbox value="Pear">{i18n.pear}</Checkbox>
 					<Checkbox value="Orange">{i18n.orange}</Checkbox>
 					<Checkbox value="OrangeDisabled" disabled>{i18n.rottenOrange}</Checkbox>
-				</CheckboxGroup>
+				</Checkbox.Group>
 			</div>
 		);
 	}

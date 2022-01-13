@@ -3,6 +3,7 @@
 #### Setup Environment
 
 ```bash
+# Make sure to install coreutils first
 yarn bootstrap
 ```
 
@@ -20,7 +21,6 @@ packages/zent
 ├── docs            # documentations
 ├── scripts         # scripts for testing, building, etc.
 ├── src             # JavaScript source code
-├── typings         # TypeScript definitions
 ```
 
 #### Add a New Component
@@ -31,11 +31,8 @@ Steps:
 - Add styles
 - Add tests
 - Add documentation
-- Add TypeScript definition
 
 The boring part is automated, just run `yarn new-component YOUR-COMPONENT-NAME` in `packages/zent`, all necessary boilerplates are created for you.
-
-Remember to add TypeScript definitions in `packages/zent/typings` for your new component.
 
 #### Naming
 
@@ -84,6 +81,6 @@ Component styles are written in `precss`, please refer to [precss documentation]
 We have rules for `z-index` within Zent, `z-index` priorities(from high to low) are defined as:
 
 * Special：Notify is always on top，[10000, +∞)
-* Popups：Pop, Select, Datetimepicker, ColorPicker, Cascader etc. [2000, 3000)
+* Popups：Pop, Select, DatePicker, ColorPicker, Cascader etc. [2000, 3000)
 * Fullscreen components：Dialog, image-preview etc. [1000, 2000)
 * Others：Used with one component to control layers, [-10, 10] is recommended, the lower the better.

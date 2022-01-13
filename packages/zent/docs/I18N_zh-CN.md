@@ -7,12 +7,11 @@
 Zent 提供一个 Provider 组件用于配置组件内部文案的语言。组件利用 context 实现对组件内部文案的配置，需要在应用最外层包裹使用。
 
 ```jsx
-import { I18nProvider as Provider } from 'zent';
-import enUS from 'zent/lib/i18n/en-US';
+import { I18nProvider, enUSLocale } from 'zent';
 
-<Provider i18n={enUS}>
+<I18nProvider value={enUSLocale}>
 	<App />
-</Provider>
+</I18nProvider>;
 ```
 
-目前仅有中文/英文两种语言包，分别对应i18n文件夹下 `en-US.js`/`zh-CN.js`两个文件。
+目前支持中文、英文以及日文三种语言包。

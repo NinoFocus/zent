@@ -11,30 +11,19 @@ group: 导航
 
 ### API
 
-| 参数 | 说明 | 类型 | 默认值 | 备选值 |
-|------|------|------|--------|--------|
-| offsetTop | 距离窗口顶部指定偏移量后触发 | number | 0 | '' |
-| offsetBottom | 距离窗口底部指定偏移量后触发 | number | null | null |
-| onPin | 触发固定后执行的回调函数 | function | null | null |
-| onUnpin | 固定消失后执行的回调函数 | function | null | null |
-| zIndex | 固钉的z-index | number | 10 | null |
-| className | 自定义额外类名  | string | `''`       |                                   |
-| placeHoldClassName | 占位容器的类名  | string | `''`       |                                   |
-| prefix    | 自定义前缀    | string | `'zent'`   |                                   |
+| 参数                 | 说明                         | 类型               | 默认值 | 备选值   |
+| -------------------- | ---------------------------- | ------------------ | ------ | -------- | --- |
+| offsetTop            | 距离窗口顶部指定偏移量后触发 | `number`           |        |          |
+| offsetBottom         | 距离窗口底部指定偏移量后触发 | `number`           |        |          |
+| getAffixContainer    | 自定义相对定位的节点         | `() => HTMLElement | null`  | `window` |     |
+| children             | 子节点                       | `React.ReactNode`  |        |          |
+| onPin                | 触发固定后执行的回调函数     | `() => void`       |        |          |
+| onUnpin              | 固定消失后执行的回调函数     | `() => void`       |        |          |
+| zIndex               | 固定时的 `z-index`           | `number`           | 10     |          |
+| className            | 自定义额外类名               | `string`           |        |          |
+| placeholderClassName | 占位容器的类名               | `string`           |        |          |
 
-如果 `offsetTop` 和 `offsetBottom` 同时设置，优先使用 `offsetBottom`
+**注意**
 
-<style>
-.demo-nav {
-    width: 100%;
-    height: 60px;
-    background-color: #ededed;
-    line-height: 60px;
-    text-align: center;
-    border: 1px solid #2B90ED;
-}
-
-.demo-bottom {
-	opacity: 0.8;
-}
-</style>
+- `offsetTop` 和 `offsetBottom` 至少传一个，也可以同时设置，同时设置的时候注意窗口高度很小的时候可能会出现两个参数行为冲突的情况，请谨慎使用。
+- 在页面有两层滚动时，需要同时使用 `ref` 和 `getAffixContainer` 实现固钉相对定位自定义节点定位，需要监听外层滚动事件。

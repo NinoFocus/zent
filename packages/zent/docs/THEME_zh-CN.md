@@ -4,79 +4,87 @@ Zent 支持主题定制，目前仅支持组件库颜色的定制。
 
 ![zent-theme](https://img.yzcdn.cn/zanui/react/zent-theme.png)
 
-### 定制方法
+### 使用 CSS Variables
 
-Zent 的样式使用 [postcss](http://postcss.org/) 开发，我们提供了一个 postcss 的插件 [postcss-theme-variables](https://www.npmjs.com/package/postcss-theme-variables) 来支持主题定制。
+Zent 使用<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties" target="_blank">CSS Variables</a>定制主题色，对于不支持 CSS Variables 的浏览器，会降级到默认主题色，可以通过重新构建 SCSS 定制主题色。
 
-有两种定制方式：
+注意：主题色需要提供两套，一套是 Hex 形式，另一套是类似 RGB 形式的，如下所示：
 
-1. 通过在 Zent 仓库中修改配置，生成一份定制的 css 样式。
-2. 直接在业务项目中引用 Zent 的 postcss 源文件并配置自定义主题，在业务项目打包过程中自动生成定制后的样式。
+```css
+:root {
+	/* 只适用于没有透明度的场景 */
+  --theme-primary-1: #252b6e;
+  --theme-primary-2: #3c46b1;
+  --theme-primary-3: #434fc9;
+  --theme-primary-4: #515ff0;
+  --theme-primary-5: #6c78f2;
+  --theme-primary-6: #7e88f3;
+  --theme-primary-7: #b0b6f8;
+	--theme-primary-8: #f2f3fe;
+	
+	/* 和上面的变量值是一样的，但适用于 rgba 的场景 */
+  --theme-rgb-primary-1: 37, 43, 110;
+  --theme-rgb-primary-2: 60, 70, 177;
+  --theme-rgb-primary-3: 67, 79, 201;
+  --theme-rgb-primary-4: 81, 95, 240;
+  --theme-rgb-primary-5: 108, 120, 242;
+  --theme-rgb-primary-6: 126, 136, 243;
+  --theme-rgb-primary-7: 176, 182, 248;
+  --theme-rgb-primary-8: 242, 243, 254;
+}
+```
 
-两种方式各有优劣。
+CSS 变量主题色生成可以参考这段代码：
 
-第一种方式对业务项目是非侵入式的，样式的定制和业务项目完全独立，这种方案的问题是每次更新 Zent 组件库都要重新生成一份定制主题。
+```scss
+// TODO: define your theme overrides here, and that's all!
+$theme-overrides: (
+	--theme-primary-1: #252b6e,
+	--theme-primary-2: #3c46b1,
+	--theme-primary-3: #434fc9,
+	--theme-primary-4: #515ff0,
+	--theme-primary-5: #6c78f2,
+	--theme-primary-6: #7e88f3,
+	--theme-primary-7: #b0b6f8,
+	--theme-primary-8: #f2f3fe,
+);
 
-第二种方式对业务项目是侵入式的，需要修改业务项目的打包配置，支持 Zent 的 postcss 源文件，好处是更新 Zent 后不需要单独去重新生成定制主题。
+@mixin theme-css-vars($vars) {
+	@each $name, $color in $vars {
+		#{$name}: $color;
+	}
+}
 
-我们的建议：如果你的项目使用 postcss 那么可以考虑方案2，否则推荐方案1。
+@mixin theme-rgb-css-vars($vars) {
+	@each $name, $color in $vars {
+		#{str-insert($name, "-rgb", 8)}: to-rgb($color);
+	}
+}
 
-#### 方案1
+@function to-rgb($color) {
+	@return red($color), green($color), blue($color);
+}
+
+:root {
+	@include theme-css-vars($theme-overrides);
+
+	// Same but used in rgba contexts
+	@include theme-rgb-css-vars($theme-overrides);
+}
+```
+
+### 重新构建 SCSS 定制主题色
+
+Zent 的样式使用 [scss](https://sass-lang.com) 开发，我们提供了一个预定义的扩展文件来支持主题定制，通过在 Zent 仓库中修改配置，生成一份定制的 css 样式。
+
+这种方式对业务项目是非侵入式的，样式的定制和业务项目完全独立；但也有一个问题，就是每次更新 Zent 组件库都要重新生成一份定制主题。
+
+#### 定制方法
 
 1. 克隆 Zent [源码](https://github.com/youzan/zent)并安装依赖
-2. 在 `packages/zent` 目录下新建一个文件，例如 `custom-theme.js`，并设置要覆盖的主题颜色，颜色的名字及默认值请参考[色彩](colors)
-3. 在 `packages/zent` 目录下面执行 `yarn theme custom-theme.js`
-4. 定制的主题会生成在 `packages/zent/css` 目录下
-
-```
-/* custom-theme.js */
-
-// 只自定义主色
-module.exports = {
-  'theme-primary-1': '#72f',
-  'theme-primary-2': '#83f',
-  'theme-primary-3': '#95f',
-  'theme-primary-4': '#dbf',
-  'theme-primary-5': '#f7e8fd',
-  'theme-primary-6': '#f3eaff',
-};
-```
-
-#### 方案2
-
-首先，项目的样式文件里需要直接引入 Zent 的样式源文件，源文件在 `zent/assets` 目录下。
-一般直接引入 `zent/assets/index.pcss` 即可，如果你希望只引入使用到的组件样式的话可以使用 [babel-plugin-zent](babel-plugin-zent) 的 `useRawStyle` 参数。
-
-请参考如下配置，确保 postcss-theme-variables 这个插件配置正确，注意事项请看 [postcss-theme-variables 文档](https://www.npmjs.com/package/postcss-theme-variables)。
-
-```
-module.exports = {
-  plugins: [
-    require('postcss-easy-import')({
-      prefix: '_',
-      extensions: ['pcss', 'css']
-    }),
-    require('postcss-theme-variables')({
-      // ... your overrides here
-      vars: {
-        'theme-primary-1': '#72f',
-        'theme-primary-2': '#83f',
-        'theme-primary-3': '#95f',
-        'theme-primary-4': '#dbf',
-        'theme-primary-5': '#f7e8fd',
-        'theme-primary-6': '#f3eaff',
-      },
-      // precss variables starts with $
-      prefix: '$'
-    })
-    require('autoprefixer'),
-    require('precss'),
-
-    // 可选压缩
-    require('cssnano')({ safe: true })
-  ]
-};
-```
+2. 在 `packages/zent/assets/theme` 目录下找到一个名为 [`_override.scss`](https://github.com/youzan/zent/blob/master/packages/zent/assets/theme/_override.scss) 的文件，这个文件是预留用来覆盖默认主题变量的，所有主题变量可以在同目录的 [`_default.scss`](https://github.com/youzan/zent/blob/master/packages/zent/assets/theme/_default.scss) 文件内找到
+3. 在 `packages/zent` 目录下面执行 `yarn theme`
+4. 定制的主题样式文件会生成在 `packages/zent/css` 目录下
 
 <style>
   img[alt="zent-theme"] {
